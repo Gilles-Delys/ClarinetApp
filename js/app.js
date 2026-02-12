@@ -1,105 +1,163 @@
+/**
+ * CLARINETTE MAESTRO - LOGIQUE PRINCIPALE
+ */
 import { AudioEngine } from './audio-engine.js';
-import { Renderer } from './renderer.js';
-import { SolfegeModule } from './modules/solfege.js';
-import { PartitionModule } from './modules/partition.js';
-import { getNoteFromFrequency } from './utils.js';
+import { NOTE_DATA, FINGERINGS, getClarinetSVG } from './data.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Initialisation des Singletons
-    const audio = new AudioEngine();
-    const renderer = new Renderer();
-    const solfege = new SolfegeModule(renderer, audio);
-    const partition = new PartitionModule(audio);
+let audioEngine = null;
+let isRunning = false;
 
-    // DOM Elements
-    const mainMenu = document.getElementById("main-menu");
-    const subMenuSolf = document.getElementById("sub-menu-solfege");
-    const subMenuPart = document.getElementById("sub-menu-partition");
-    const controlsArea = document.getElementById("controls-area");
-    const noteDisplay = document.getElementById("note-detected");
-    const tunerBar = document.getElementById("tuner-bar");
-    const freqDisplay = document.getElementById("frequency-display");
+let gameState = {
+    currentNote: null,
+    currentNoteIndex: 0,
+    notesPool: [],
+    validating: false
+};
 
-    // --- ACTIVATION DU TUNER PERMANENT ---
-    // On lance le micro immédiatement pour l'accordeur global
-    audio.startMicrophone((freq) => {
-        if (freq && freq !== -1) {
-            const detected = getNoteFromFrequency(freq);
-            if (detected) {
-                noteDisplay.innerText = detected.name + detected.octave;
-                freqDisplay.innerText = Math.round(freq) + " Hz";
-                
-                // Calcul de la barre (position 50% = juste)
-                const offset = detected.cents; // de -50 à +50
-                const percent = 50 + offset; 
-                tunerBar.style.left = Math.max(0, Math.min(100, percent)) + "%";
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialisation visuelle
+    const container = document.getElementById('clarinet-svg-container');
+    if (container) container.innerHTML = getClarinetSVG();
+    
+    renderStaff([]); 
 
-                if (Math.abs(offset) < 10) {
-                    tunerBar.classList.add("in-tune");
-                    noteDisplay.style.color = "green";
-                } else {
-                    tunerBar.classList.remove("in-tune");
-                    noteDisplay.style.color = "black";
-                }
-            }
-        } else {
-            noteDisplay.innerText = "--";
-            freqDisplay.innerText = "0 Hz";
-            tunerBar.style.left = "50%";
-        }
-    });
+    document.getElementById('btn-start').onclick = startExercise;
+    document.getElementById('btn-stop').onclick = stopExercise;
+});
 
-    // --- GESTION DES MENUS ---
+async function startExercise() {
+    if (isRunning) return;
+    
+    if (!audioEngine) {
+        audioEngine = new AudioEngine();
+    }
+    
+    const diff = document.getElementById('difficulty-level').value;
+    const useAlt = document.getElementById('alterations-check').checked;
+    
+    gameState.notesPool = generateNotesPool(diff, useAlt);
+    gameState.currentNoteIndex = 0;
+    
+    document.getElementById('btn-start').disabled = true;
+    document.getElementById('btn-stop').disabled = false;
 
-    mainMenu.addEventListener("change", (e) => {
-        const mode = e.target.value;
-        subMenuSolf.classList.toggle("hidden", mode !== "solfege");
-        subMenuPart.classList.toggle("hidden", mode !== "partition");
-        handleSubMenu();
-    });
+    try {
+        await audioEngine.startMicrophone((freq) => {
+            if (isRunning) handleAudioInput(freq);
+        });
+        isRunning = true;
+        nextNote();
+    } catch (err) {
+        alert("Impossible d'accéder au micro.");
+        stopExercise();
+    }
+}
 
-    subMenuSolf.addEventListener("change", handleSubMenu);
-    subMenuPart.addEventListener("change", handleSubMenu);
+function generateNotesPool(difficulty, useAlt) {
+    let maxLvl = 2;
+    if (difficulty === 'intermediaire') maxLvl = 3;
+    if (difficulty === 'difficile') maxLvl = 4;
+    if (difficulty === 'tres-difficile') maxLvl = 5;
+    if (difficulty === 'tres-facile') maxLvl = 1;
 
-    function handleSubMenu() {
-        controlsArea.innerHTML = "";
-        const mode = mainMenu.value;
-        
-        if (mode === "solfege") {
-            const sub = subMenuSolf.value;
-            if (sub === "notes") {
-                // On prépare l'interface en haut comme demandé
-                controlsArea.innerHTML = `
-                    <div class="ui-top-bar">
-                        <label><input type="checkbox" id="accidental-check"> Avec Altérations</label>
-                        <select id="level-select">
-                            <option value="debutant">Débutant (Chalumeau)</option>
-                            <option value="inter">Intermédiaire</option>
-                            <option value="expert">Expert (Complet)</option>
-                        </select>
-                        <button id="btn-start-game" class="btn-play">▶ Commencer la série</button>
-                        <button id="btn-stop-game" class="btn-stop">⬛ Arrêter</button>
-                    </div>
-                `;
-                
-                document.getElementById("btn-start-game").onclick = () => {
-                    const diff = document.getElementById("level-select").value;
-                    const useAcc = document.getElementById("accidental-check").checked;
-                    solfege.startNotesGame(diff, useAcc);
-                };
-
-                document.getElementById("btn-stop-game").onclick = () => {
-                    location.reload(); // Moyen simple de tout réinitialiser proprement
-                };
-
-            } else if (sub === "gammes") {
-                solfege.renderGammesUI();
-            }
-        } 
-        else if (mode === "partition") {
-            partition.renderUI(subMenuPart.value);
-        }
+    let avail = NOTE_DATA.filter(n => n.level <= maxLvl);
+    if (!useAlt) {
+        avail = avail.filter(n => !n.note.includes('#') && !n.note.includes('b'));
     }
 
-    handleSubMenu();
-});
+    let p = [];
+    for(let i=0; i<20; i++) {
+        p.push(avail[Math.floor(Math.random()*avail.length)]);
+    }
+    return p;
+}
+
+function nextNote() {
+    if (gameState.currentNoteIndex >= 20) {
+        alert("Série terminée ! Bravo.");
+        stopExercise();
+        return;
+    }
+    
+    gameState.currentNote = gameState.notesPool[gameState.currentNoteIndex];
+    
+    document.getElementById('progress-count').textContent = gameState.currentNoteIndex + 1;
+    document.getElementById('target-note-name').textContent = gameState.currentNote.note + gameState.currentNote.octave;
+    document.getElementById('target-note-name').style.color = "red";
+    
+    renderStaff([gameState.currentNote.vexKey]);
+    updateClarinetVisual(gameState.currentNote);
+    gameState.validating = false;
+}
+
+function handleAudioInput(freq) {
+    if (freq === -1 || !gameState.currentNote) return;
+
+    const targetFreq = gameState.currentNote.freq;
+    const cents = 1200 * Math.log2(freq / targetFreq);
+    
+    document.getElementById('detected-freq').textContent = Math.round(freq);
+    const bar = document.getElementById('tuner-bar');
+    bar.style.left = Math.max(0, Math.min(100, 50 + cents)) + "%";
+
+    if (Math.abs(cents) < 15) {
+        bar.style.backgroundColor = "green";
+        if (!gameState.validating) {
+            gameState.validating = true;
+            setTimeout(() => {
+                if (gameState.validating && isRunning) {
+                    document.getElementById('target-note-name').style.color = "green";
+                    gameState.currentNoteIndex++;
+                    nextNote();
+                }
+            }, 800);
+        }
+    } else {
+        bar.style.backgroundColor = "#d35400";
+        gameState.validating = false;
+    }
+}
+
+function updateClarinetVisual(noteObj) {
+    document.querySelectorAll('.cl-active').forEach(el => el.classList.remove('cl-active'));
+    const noteKey = noteObj.note + noteObj.octave;
+    const fingering = FINGERINGS[noteKey];
+    
+    if (fingering && fingering.keys) {
+        fingering.keys.forEach(k => {
+            let id = k.match(/^\d+$/) ? "hole-" + k : (k === "T" ? "hole-T" : (k.startsWith("key-") ? k : "key-" + k));
+            const el = document.getElementById(id);
+            if (el) el.classList.add('cl-active');
+        });
+    }
+}
+
+function renderStaff(notesKeys) {
+    const div = document.getElementById('staff-container');
+    div.innerHTML = "";
+    const VF = Vex.Flow;
+    const renderer = new VF.Renderer(div, VF.Renderer.Backends.SVG);
+    renderer.resize(250, 130);
+    const context = renderer.getContext();
+    const stave = new VF.Stave(10, 10, 230);
+    stave.addClef("treble").setContext(context).draw();
+    
+    if (notesKeys.length > 0) {
+        const notes = [new VF.StaveNote({ keys: notesKeys, duration: "w" })];
+        notes.forEach(n => {
+            const key = n.getKeys()[0];
+            if (key.includes('#')) n.addModifier(new VF.Accidental("#"), 0);
+            if (key.includes('b')) n.addModifier(new VF.Accidental("b"), 0);
+        });
+        VF.Formatter.FormatAndDraw(context, stave, notes);
+    }
+}
+
+function stopExercise() {
+    isRunning = false;
+    if (audioEngine) audioEngine.stop();
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-stop').disabled = true;
+    document.getElementById('target-note-name').textContent = "Prêt ?";
+    document.getElementById('target-note-name').style.color = "black";
+}
