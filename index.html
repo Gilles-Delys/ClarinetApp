@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clarinet Master - Apprentissage</title>
+    <script src="https://unpkg.com/vexflow/releases/vexflow-debug.js"></script>
+    <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header>
+        <h1>Clarinet Master</h1>
+        <nav>
+            <select id="main-menu">
+                <option value="solfege">Solfège</option>
+                <option value="partition">Partition</option>
+            </select>
+            
+            <select id="sub-menu-solfege">
+                <option value="notes">Les Notes (Exercice)</option>
+                <option value="gammes">Les Gammes Majeures</option>
+            </select>
+
+            <select id="sub-menu-partition" class="hidden">
+                <option value="file">Depuis un Fichier</option>
+                <option value="mic">Depuis une source sonore (Micro)</option>
+                <option value="web">Depuis une séquence Web</option>
+            </select>
+        </nav>
+    </header>
+
+    <main>
+        <div id="tuner-container">
+            <div id="note-detected">--</div>
+            <div class="tuner-bar-bg">
+                <div id="tuner-bar" class="tuner-bar-fill"></div>
+            </div>
+            <div id="frequency-display">0 Hz</div>
+        </div>
+
+        <div id="workspace">
+            <div id="staff-container"></div>
+            <div id="fingering-container"></div>
+        </div>
+
+        <div id="controls-area"></div>
+    </main>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
