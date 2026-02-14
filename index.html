@@ -263,6 +263,13 @@ let lastDetectedFreq = 0;
 async function initAudio() {
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // --- CORRECTION: Forcer le démarrage du contexte audio ---
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+        // ---------------------------------------------------------
+
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 2048;
         
