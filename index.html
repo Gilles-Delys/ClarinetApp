@@ -7,7 +7,7 @@
     <style>
         :root {
             /* Palette Awesome Blue */
-            --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            --bg-gradient: linear-gradient(135deg, #245268 0%, #388aa5 50%, #3daad8 100%);
             --panel-bg: rgba(255, 255, 255, 0.1);
             --panel-border: rgba(255, 255, 255, 0.2);
             --text-color: #ffffff;
@@ -151,7 +151,7 @@
 
         #tuner-bar {
             width: 100%;
-            height: 12px;
+            height: 18px;
             background: rgba(0,0,0,0.5);
             margin-top: 15px;
             position: relative;
@@ -160,7 +160,7 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         #tuner-indicator {
-            width: 6px;
+            width: 10px;
             height: 100%;
             background: #fff;
             position: absolute;
@@ -496,10 +496,10 @@ function checkNote(detectedFreq) {
                 setTimeout(() => {
                     displayElement.dataset.successLocked = "";
                     if (queueIndex >= noteQueue.length) {
-                         // Fin de série : délai plus long avant nouvelle série
-                         displayElement.innerHTML = `<span class="status-match" style="color:#fff">SÉRIE TERMINÉE !</span>`;
-                         drawStaff(noteQueue, queueIndex); // Redessine pour montrer tout vert
-                         setTimeout(startNewSequence, 1500);
+                          // Fin de série : délai plus long avant nouvelle série
+                          displayElement.innerHTML = `<span class="status-match" style="color:#fff">SÉRIE TERMINÉE !</span>`;
+                          drawStaff(noteQueue, queueIndex); // Redessine pour montrer tout vert
+                          setTimeout(startNewSequence, 1500);
                     } else {
                         updateUI();
                     }
@@ -621,10 +621,11 @@ function drawStaff(notes, activeIndex) {
 }
 
 function showFingering(noteName) {
+    // CORRECTION ICI : On vide le style inline pour laisser le CSS (classes .key .hole) gérer les couleurs
     document.querySelectorAll('.key, .hole').forEach(el => {
-        el.style.fill = el.classList.contains('hole') ? "#222" : "#bbb";
-        el.classList.remove('active', 'closed');
-        el.style.stroke = el.classList.contains('hole') ? "#888" : "#555";
+        el.style.fill = "";   // On enlève le style forcé
+        el.style.stroke = ""; // On enlève le style forcé
+        el.classList.remove('active', 'closed'); // On enlève l'état actif
     });
 
     const data = NOTES_DATA[noteName];
