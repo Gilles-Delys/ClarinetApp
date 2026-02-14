@@ -3,129 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clarinette Maestro Pro - v3-Fix</title>
-    <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Clarinet Pro Trainer - Bb Edition</title>
     <style>
         :root {
-            --bg-color: #f0f8ff;
-            --panel-bg: #ffffff;
-            --primary-color: #d35400;
-            --text-color: #2c3e50;
-            --gray-contour: #333333;
-            --active-red: #ff0000;
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --success-color: #03dac6;
+            --error-color: #cf6679;
+            --text-color: #e0e0e0;
         }
 
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0; padding: 20px;
-            display: flex; flex-direction: column;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
         header {
-            background: white; padding: 15px 20px; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .controls-bar {
-            background: white; padding: 15px; border-radius: 8px;
-            display: flex; gap: 20px; align-items: center; margin-bottom: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            flex-wrap: wrap;
-        }
-
-        .workspace { display: flex; gap: 20px; flex-wrap: wrap; }
-
-        .notation-area, .visual-area {
-            background: var(--panel-bg); border-radius: 8px; padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            flex: 1; min-width: 350px;
+            width: 100%;
+            background-color: var(--surface-color);
+            padding: 1rem;
             text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
 
-        .tuner-bar-bg {
-            width: 100%; height: 25px; background: #ecf0f1; border-radius: 12px;
-            position: relative; overflow: hidden; border: 1px solid #bdc3c7; margin: 15px 0;
+        h1 { margin: 0; font-size: 1.5rem; color: var(--primary-color); }
+
+        #controls {
+            margin: 20px 0;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        .tuner-bar-fill {
-            height: 100%; width: 10px; background: var(--primary-color);
-            position: absolute; left: 50%; transition: left 0.1s ease-out;
+        button, select {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: background 0.2s;
         }
 
-        .cl-contour { fill: none; stroke: var(--gray-contour); stroke-width: 1.5; }
-        .cl-hole-bg { fill: #ffffff; stroke: var(--gray-contour); stroke-width: 1.5; }
-        .cl-active { fill: var(--active-red) !important; stroke: var(--active-red) !important; }
+        button#start-btn { background-color: var(--success-color); color: #000; }
+        button#next-btn { background-color: var(--primary-color); color: #000; display: none; }
+        select { background-color: var(--surface-color); color: var(--text-color); border: 1px solid #333; }
 
-        #staff-container { min-height: 150px; display: flex; justify-content: center; }
+        #main-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            width: 95%;
+            max-width: 1200px;
+        }
 
-        .btn-primary { background: #27ae60; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        .btn-stop { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
-        button:disabled { background: #bdc3c7; }
+        .panel {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Canvas Portée */
+        #staff-container { width: 320px; height: 250px; position: relative; }
+        canvas#staff-canvas { background-color: #fff; border-radius: 4px; }
+
+        /* Clarinette Visuelle */
+        #fingering-container { width: 300px; height: 500px; position: relative; }
+        .clarinet-svg { height: 100%; width: auto; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5)); }
+        
+        /* Indicateurs de clés (SVG classes) */
+        .key { fill: #555; stroke: #888; stroke-width: 1; transition: fill 0.2s; }
+        .key.active { fill: var(--success-color); stroke: #fff; }
+        .hole { fill: #000; stroke: #888; stroke-width: 2; }
+        .hole.closed { fill: var(--success-color); }
+
+        #feedback-area {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            min-height: 60px;
+        }
+
+        .status-detected { color: #888; font-size: 0.9rem; }
+        .status-match { color: var(--success-color); font-weight: bold; font-size: 1.5rem; }
+        .status-wrong { color: var(--error-color); }
+        
+        #tuner-bar {
+            width: 300px;
+            height: 10px;
+            background: #333;
+            margin-top: 10px;
+            position: relative;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #tuner-indicator {
+            width: 4px;
+            height: 100%;
+            background: #fff;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: left 0.1s linear;
+        }
+        #center-marker {
+            width: 2px;
+            height: 100%;
+            background: var(--success-color);
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+
     </style>
 </head>
 <body>
-    <header>
-        <h1><i class="fas fa-music"></i> Clarinette Maestro</h1>
-        <div class="menu-group">
-            <label>Mode :</label>
-            <select id="main-mode-select">
-                <option value="solfege">Solfège (Exercices)</option>
-                <option value="partition">Partition (Export)</option>
-            </select>
+
+<header>
+    <h1>Clarinet Trainer - Si Bémol (Bb)</h1>
+    <div style="font-size: 0.8rem; opacity: 0.7;">Microphone requis • Jouez la note affichée</div>
+</header>
+
+<div id="controls">
+    <select id="level-select">
+        <option value="1">Niveau 1: Chalumeau (Mi3 - La4)</option>
+        <option value="2">Niveau 2: Passage (La3 - Do5)</option>
+        <option value="3">Niveau 3: Clairon (Si4 - Do6)</option>
+        <option value="4">Niveau 4: Chromatique Complet</option>
+        <option value="5">Niveau 5: Altissimo & Sauts</option>
+    </select>
+    <button id="start-btn">Activer Micro & Commencer</button>
+    <button id="next-btn">Note Suivante</button>
+</div>
+
+<div id="feedback-area">
+    <div id="instruction">Appuyez sur "Activer Micro" pour commencer.</div>
+    <div id="detected-note" class="status-detected">--</div>
+    <div id="tuner-bar"><div id="center-marker"></div><div id="tuner-indicator"></div></div>
+</div>
+
+<div id="main-display">
+    <div class="panel">
+        <h3>Note à jouer (Écrite)</h3>
+        <div id="staff-container">
+            <canvas id="staff-canvas" width="320" height="250"></canvas>
         </div>
-    </header>
+    </div>
 
-    <main id="app-container">
-        <div class="controls-bar">
-            <div class="control-item">
-                <label>Difficulté :</label>
-                <select id="difficulty-level">
-                    <option value="tres-facile">Très facile (Mi3 - La3)</option>
-                    <option value="facile" selected>Facile (Mi3 - Do5)</option>
-                    <option value="intermediaire">Intermédiaire (Mi3 - Sol5)</option>
-                    <option value="difficile">Difficile (Mi3 - Do6)</option>
-                    <option value="tres-difficile">Très difficile (Mi3 - Do7)</option>
-                </select>
-            </div>
-            <div class="control-item">
-                <label>Altérations :</label>
-                <input type="checkbox" id="alterations-check">
-            </div>
-            <button id="btn-start" class="btn-primary">▶ Commencer la série</button>
-            <button id="btn-stop" class="btn-stop" disabled>⬛ Arrêter</button>
+    <div class="panel">
+        <h3>Doigté (Système Boehm)</h3>
+        <div id="fingering-container">
+            <svg class="clarinet-svg" viewBox="0 0 100 400" xmlns="http://www.w3.org/2000/svg">
+                <rect x="40" y="10" width="20" height="380" rx="10" fill="#222" stroke="#444"/>
+                
+                <circle id="key-R" class="key" cx="25" cy="40" r="6" />
+                <text x="10" y="45" fill="#555" font-size="8">12 (Reg)</text>
+
+                <circle id="key-T" class="hole" cx="50" cy="55" r="5" />
+                <text x="75" y="60" fill="#555" font-size="8">T</text>
+
+                <rect id="key-A" class="key" x="35" y="20" width="10" height="5" /> <rect id="key-Ab" class="key" x="35" y="28" width="10" height="5" /> <circle id="key-L1" class="hole" cx="50" cy="80" r="5" />
+                <circle id="key-L2" class="hole" cx="50" cy="100" r="5" />
+                <circle id="key-L3" class="hole" cx="50" cy="120" r="5" />
+                
+                <rect id="key-L4-E" class="key" x="65" y="130" width="15" height="8" rx="2"/> <rect id="key-L4-F" class="key" x="65" y="140" width="15" height="8" rx="2"/> <rect id="key-L4-Fsharp" class="key" x="20" y="135" width="15" height="8" rx="2"/> <circle id="key-R1" class="hole" cx="50" cy="180" r="5" />
+                <circle id="key-R2" class="hole" cx="50" cy="200" r="5" />
+                <circle id="key-R3" class="hole" cx="50" cy="220" r="5" />
+
+                <rect id="key-Side1" class="key" x="65" y="90" width="8" height="20" rx="2"/> 
+
+                <rect id="key-R4-E" class="key" x="20" y="230" width="15" height="8" rx="2"/>
+                <rect id="key-R4-F" class="key" x="20" y="240" width="15" height="8" rx="2"/>
+                <rect id="key-R4-Fsharp" class="key" x="65" y="235" width="15" height="8" rx="2"/>
+                <rect id="key-R4-Gsharp" class="key" x="65" y="215" width="15" height="8" rx="2"/> </svg>
         </div>
+    </div>
+</div>
 
-        <div class="workspace">
-            <div class="notation-area">
-                <div class="score-display">Note : <span id="progress-count">0</span> / 20</div>
-                <div id="staff-container"></div>
-                <h2 id="target-note-name">Prêt ?</h2>
-                <div class="tuner-box">
-                    <div class="tuner-bar-bg">
-                        <div id="tuner-bar" class="tuner-bar-fill"></div>
-                    </div>
-                    <div class="frequency-info">
-                        <span id="detected-freq">0</span> Hz | <span id="feedback-message">Attente...</span>
-                    </div>
-                </div>
-            </div>
+<script>
+/**
+ * DONNÉES ET CONFIGURATION
+ */
+const NOTES_DATA = {
+    // Format: "NomNoteOctave": { freq: (Concert Pitch Hz), fingering: ['ID_DES_CLES_SVG'] }
+    // Clarinette en Sib : On lit Do, on entend Sib. 
+    // Les fréquences ci-dessous sont les fréquences RÉELLES (CONCERT) attendues pour la note ÉCRITE.
+    // E3 écrit = D3 Concert (146.83 Hz)
+    
+    // Chalumeau
+    "E3": { freq: 146.83, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
+    "F3": { freq: 155.56, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F"] },
+    "F#3": { freq: 164.81, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Fsharp"] },
+    "G3": { freq: 174.61, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3"] },
+    "G#3": { freq: 185.00, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Gsharp"] },
+    "A3": { freq: 196.00, keys: ["T", "L1", "L2", "L3", "R1", "R2"] },
+    "A#3": { freq: 207.65, keys: ["T", "L1", "L2", "L3", "R1"] }, // Ou fourche
+    "B3": { freq: 220.00, keys: ["T", "L1", "L2", "L3", "R2"] }, // Fourche basique
+    "C4": { freq: 233.08, keys: ["T", "L1", "L2", "L3"] },
+    "C#4": { freq: 246.94, keys: ["T", "L1", "L2", "L3", "L4-Fsharp"] },
+    "D4": { freq: 261.63, keys: ["T", "L1", "L2"] },
+    "D#4": { freq: 277.18, keys: ["T", "L1", "L2", "Side1"] }, // Simplifié
+    "E4": { freq: 293.66, keys: ["T", "L1"] },
+    "F4": { freq: 311.13, keys: ["T"] },
+    "F#4": { freq: 329.63, keys: ["L1"] }, // Chalumeau bas
+    "G4": { freq: 349.23, keys: [] }, // Ouvert
+    "G#4": { freq: 369.99, keys: ["Ab"] },
+    "A4": { freq: 392.00, keys: ["A"] },
+    "A#4": { freq: 415.30, keys: ["A", "R"] }, // Bb clairon
+    
+    // Clairon (Registre)
+    "B4": { freq: 440.00, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
+    "C5": { freq: 466.16, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F"] },
+    "C#5": { freq: 493.88, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Fsharp"] },
+    "D5": { freq: 523.25, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3"] },
+    "D#5": { freq: 554.37, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Gsharp"] },
+    "E5": { freq: 587.33, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2"] },
+    "F5": { freq: 622.25, keys: ["R", "T", "L1", "L2", "L3", "R1"] },
+    "F#5": { freq: 659.25, keys: ["R", "T", "L1", "L2", "L3", "R2"] },
+    "G5": { freq: 698.46, keys: ["R", "T", "L1", "L2", "L3"] },
+    "G#5": { freq: 739.99, keys: ["R", "T", "L1", "L2", "L3", "R4-Gsharp"] },
+    "A5": { freq: 783.99, keys: ["R", "T", "L1", "L2"] },
+    "A#5": { freq: 830.61, keys: ["R", "T", "L1", "L2", "Side1"] },
+    "B5": { freq: 880.00, keys: ["R", "T", "L1"] },
+    "C6": { freq: 932.33, keys: ["R", "T"] }
+};
 
-            <div class="visual-area">
-                <h3>Doigté Système Boehm</h3>
-                <div id="clarinet-svg-container"></div>
-            </div>
-        </div>
-    </main>
+const LEVELS = {
+    1: ["E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4"], // Basique
+    2: ["G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"], // Passage registre
+    3: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5"], // Clairon complet
+    4: ["C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5", "G#5"], // Altérations
+    5: Object.keys(NOTES_DATA) // Tout
+};
 
-    <footer style="position: fixed; bottom: 0; right: 0; background: rgba(0,0,0,0.5); color: white; padding: 5px; font-size: 10px; z-index: 1000;">
-        Version: 2026-02-12_v3-Fix
-    </footer>
+/**
+ * MOTEUR AUDIO
+ */
+let audioContext;
+let analyser;
+let microphone;
+let isListening = false;
+let currentTargetNote = null;
+let lastDetectedFreq = 0;
 
-    <script type="module" src="js/app.js"></script>
+async function initAudio() {
+    try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        microphone = audioContext.createMediaStreamSource(stream);
+        microphone.connect(analyser);
+        
+        isListening = true;
+        updatePitch();
+        
+        document.getElementById('start-btn').style.display = 'none';
+        document.getElementById('next-btn').style.display = 'inline-block';
+        document.getElementById('instruction').innerText = "Jouez la note affichée !";
+        
+        nextNote();
+    } catch (err) {
+        alert("Erreur d'accès au micro. Vérifiez les permissions ou utilisez HTTPS/Localhost. " + err);
+    }
+}
+
+// Algorithme d'autocorrélation pour la détection de pitch
+function autoCorrelate(buf, sampleRate) {
+    let size = buf.length;
+    let rms = 0;
+    for (let i = 0; i < size; i++) {
+        let val = buf[i];
+        rms += val * val;
+    }
+    rms = Math.sqrt(rms / size);
+    if (rms < 0.01) return -1; // Signal trop faible (silence)
+
+    let r1 = 0, r2 = size - 1, thres = 0.2;
+    for (let i = 0; i < size / 2; i++)
+        if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    for (let i = 1; i < size / 2; i++)
+        if (Math.abs(buf[size - i]) < thres) { r2 = size - i; break; }
+
+    buf = buf.slice(r1, r2);
+    size = buf.length;
+
+    let c = new Array(size).fill(0);
+    for (let i = 0; i < size; i++)
+        for (let j = 0; j < size - i; j++)
+            c[i] = c[i] + buf[j] * buf[j + i];
+
+    let d = 0; while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < size; i++) {
+        if (c[i] > maxval) {
+            maxval = c[i];
+            maxpos = i;
+        }
+    }
+    let T0 = maxpos;
+    let x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1];
+    let a = (x1 + x3 - 2 * x2) / 2;
+    let b = (x3 - x1) / 2;
+    if (a) T0 = T0 - b / (2 * a);
+
+    return sampleRate / T0;
+}
+
+function updatePitch() {
+    if (!isListening) return;
+    
+    const buf = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buf);
+    const freq = autoCorrelate(buf, audioContext.sampleRate);
+    
+    if (freq !== -1) {
+        lastDetectedFreq = freq;
+        checkNote(freq);
+    }
+    
+    requestAnimationFrame(updatePitch);
+}
+
+/**
+ * LOGIQUE DE JEU & AFFICHAGE
+ */
+
+function checkNote(detectedFreq) {
+    if (!currentTargetNote) return;
+
+    const targetData = NOTES_DATA[currentTargetNote];
+    const targetFreq = targetData.freq;
+    
+    // Calcul des cents de différence : 1200 * log2(f1 / f2)
+    const centsDiff = 1200 * Math.log2(detectedFreq / targetFreq);
+    
+    // UI Tuner
+    const tunerIndicator = document.getElementById('tuner-indicator');
+    // Clamp entre -50 et +50 cents pour l'affichage visuel
+    let displayCents = Math.max(-50, Math.min(50, centsDiff));
+    let percent = 50 + displayCents; 
+    tunerIndicator.style.left = `${percent}%`;
+    
+    const displayElement = document.getElementById('detected-note');
+    
+    // Tolérance : +/- 15 cents c'est "juste" pour un apprenant
+    if (Math.abs(centsDiff) < 15) {
+        displayElement.innerHTML = `<span class="status-match">CORRECT ! (${Math.round(detectedFreq)}Hz)</span>`;
+        tunerIndicator.style.backgroundColor = "#03dac6";
+        
+        // Auto-suivant après 1.5s
+        if (!displayElement.dataset.successLocked) {
+             displayElement.dataset.successLocked = "true";
+             setTimeout(() => {
+                 displayElement.dataset.successLocked = "";
+                 nextNote();
+             }, 1500);
+        }
+    } else {
+        displayElement.innerText = `Détecté: ${Math.round(detectedFreq)} Hz (Cible: ${targetFreq} Hz)`;
+        tunerIndicator.style.backgroundColor = Math.abs(centsDiff) > 50 ? "#cf6679" : "#fff";
+    }
+}
+
+function nextNote() {
+    const level = parseInt(document.getElementById('level-select').value);
+    const notesPool = LEVELS[level];
+    
+    // Eviter la répétition immédiate
+    let next;
+    do {
+        next = notesPool[Math.floor(Math.random() * notesPool.length)];
+    } while (next === currentTargetNote && notesPool.length > 1);
+    
+    currentTargetNote = next;
+    
+    // Reset UI
+    document.getElementById('detected-note').innerText = "...";
+    document.getElementById('tuner-indicator').style.left = "50%";
+    
+    drawStaff(currentTargetNote);
+    showFingering(currentTargetNote);
+}
+
+/**
+ * RENDU VISUEL (CANVAS & SVG)
+ */
+
+const canvas = document.getElementById('staff-canvas');
+const ctx = canvas.getContext('2d');
+
+function drawStaff(noteName) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Configuration portée
+    const startX = 40;
+    const endX = 280;
+    const staffY = 100; // Ligne du haut (Fa5)
+    const lineSpacing = 15;
+    
+    // Dessiner 5 lignes
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 5; i++) {
+        let y = staffY + (i * lineSpacing);
+        ctx.beginPath();
+        ctx.moveTo(startX, y);
+        ctx.lineTo(endX, y);
+        ctx.stroke();
+    }
+    
+    // Dessiner Clé de Sol (Simplifiée graphiquement ou texte)
+    ctx.font = "60px serif";
+    ctx.fillStyle = "#000";
+    ctx.fillText("𝄞", 10, staffY + 45);
+
+    // Positionner la note
+    // On définit C4 (Do central) comme référence bas
+    // Dans notre canvas, la ligne du bas (Mi4) est à staffY + 4 * 15
+    const positions = {
+        "E3": 10, "F3": 9.5, "F#3": 9.5, "G3": 9, "G#3": 9, "A3": 8.5, "A#3": 8.5, "B3": 8,
+        "C4": 7.5, "C#4": 7.5, "D4": 7, "D#4": 7, "E4": 6.5, "F4": 6, "F#4": 6, "G4": 5.5, "G#4": 5.5, "A4": 5, "A#4": 5,
+        "B4": 4.5, "C5": 4, "C#5": 4, "D5": 3.5, "D#5": 3.5, "E5": 3, "F5": 2.5, "F#5": 2.5, "G5": 2, "G#5": 2, "A5": 1.5, "A#5": 1.5,
+        "B5": 1, "C6": 0.5
+    };
+    
+    // Offset calcul : Une position = 0.5 * lineSpacing
+    // E4 (Ligne bas) est à index 4 (0-based from top line E5? Non. Sol-Si-Re-Fa-La ? Non, Mi-Sol-Si-Re-Fa)
+    // Ligne bas = Mi4. Ligne haut = Fa5.
+    
+    // Calcul de position Y
+    // Ligne haut (Fa5) = staffY
+    // Espace sous Fa5 (Mi5) = staffY + 7.5
+    // Référence: Fa5 est sur la ligne.
+    // E4 (ligne du bas) : Fa5 -> Mi4 = 8 degrés diatoniques. 8 * (lineSpacing/2).
+    
+    // Mapping manuel pour être sûr (Top line = 0)
+    // F5=0, E5=0.5, D5=1, C5=1.5, B4=2 (Center), A4=2.5, G4=3, F4=3.5, E4=4 (Bas)
+    const noteStepsFromTop = {
+        "C6": -2, // Ligne supp
+        "B5": -1.5,
+        "A#5": -1, "A5": -1, // Ligne supp
+        "G#5": -0.5, "G5": -0.5,
+        "F#5": 0, "F5": 0,
+        "E5": 0.5,
+        "D#5": 1, "D5": 1,
+        "C#5": 1.5, "C5": 1.5,
+        "B4": 2,
+        "A#4": 2.5, "A4": 2.5,
+        "G#4": 3, "G4": 3,
+        "F#4": 3.5, "F4": 3.5,
+        "E4": 4,
+        "D#4": 4.5, "D4": 4.5,
+        "C#4": 5, "C4": 5, // Ligne supp
+        "B3": 5.5,
+        "A#3": 6, "A3": 6, // Ligne supp
+        "G#3": 6.5, "G3": 6.5,
+        "F#3": 7, "F3": 7, // Ligne supp
+        "E3": 7.5
+    };
+    
+    const steps = noteStepsFromTop[noteName];
+    const noteY = staffY + (steps * lineSpacing);
+    const noteX = 160;
+
+    // Lignes supplémentaires
+    if (steps >= 5) { // Bas
+        for (let s = 5; s <= steps; s++) {
+            if (s % 1 === 0) { // Si entier, c'est une ligne
+                let ly = staffY + (s * lineSpacing);
+                ctx.beginPath(); ctx.moveTo(noteX - 20, ly); ctx.lineTo(noteX + 20, ly); ctx.stroke();
+            }
+        }
+    }
+    if (steps <= -1) { // Haut
+        for (let s = -1; s >= steps; s--) {
+            if (s % 1 === 0) {
+                let ly = staffY + (s * lineSpacing);
+                ctx.beginPath(); ctx.moveTo(noteX - 20, ly); ctx.lineTo(noteX + 20, ly); ctx.stroke();
+            }
+        }
+    }
+
+    // Dessiner la tête de note
+    ctx.beginPath();
+    ctx.ellipse(noteX, noteY, 12, 10, 0, 0, 2 * Math.PI);
+    ctx.fillStyle = "#000";
+    ctx.fill();
+
+    // Dièse (#)
+    if (noteName.includes("#")) {
+        ctx.font = "24px Arial";
+        ctx.fillText("♯", noteX - 35, noteY + 8);
+    }
+    
+    // Nom de note (Aide visuelle)
+    ctx.font = "16px Arial";
+    ctx.fillStyle = "#666";
+    ctx.fillText(noteName, noteX - 10, 240);
+}
+
+function showFingering(noteName) {
+    // Reset keys
+    document.querySelectorAll('.key, .hole').forEach(el => {
+        el.style.fill = el.classList.contains('hole') ? "#000" : "#555";
+        el.classList.remove('active', 'closed');
+    });
+
+    const data = NOTES_DATA[noteName];
+    if (!data) return;
+
+    data.keys.forEach(keyId => {
+        const el = document.getElementById(`key-${keyId}`);
+        if (el) {
+            if (el.classList.contains('hole')) {
+                el.style.fill = "var(--success-color)"; // Trou bouché
+                el.classList.add('closed');
+            } else {
+                el.style.fill = "var(--success-color)"; // Clé appuyée
+                el.classList.add('active');
+            }
+        }
+    });
+}
+
+// Initialisation des events
+document.getElementById('start-btn').addEventListener('click', initAudio);
+document.getElementById('next-btn').addEventListener('click', nextNote);
+document.getElementById('level-select').addEventListener('change', () => {
+    if (isListening) nextNote();
+});
+
+</script>
 </body>
 </html>
