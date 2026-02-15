@@ -4,25 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clarinet Pro Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            /* Palette Awesome Blue */
-            --bg-gradient: linear-gradient(135deg, #245268 0%, #388aa5 50%, #3daad8 100%);
-            --panel-bg: rgba(255, 255, 255, 0.1);
-            --panel-border: rgba(255, 255, 255, 0.2);
-            --text-color: #ffffff;
-            --primary-accent: #00d2ff; /* Bleu cyan vibrant */
-            --success-color: #2ecc71;  /* Vert émeraude */
-            --current-note-color: #e74c3c; /* Rouge vif pour la note active */
-            --pending-note-color: #000000; /* Noir pour les notes à venir */
-            --error-color: #ff6b6b;
-            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* Palette Méditerranée Awesome */
+            --bg-gradient: linear-gradient(135deg, #0b4aa7 0%, #0f4ba5 35%, #1c71bb 70%, #27a4ec 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.25);
+            
+            --text-main: #ffffff;
+            --primary-btn: #00b4d8; /* Bleu Lagon */
+            --start-btn: #06d6a0;   /* Vert Menthe */
+            --danger-color: #ef476f; /* Rouge Pastel */
+            --accent-gold: #ffd166;
+            
+            --note-current: #ef476f;
+            --note-success: #06d6a0;
+            --note-pending: #000000;
+            
+            --font-main: 'Poppins', sans-serif;
         }
 
         body {
             font-family: var(--font-main);
             background: var(--bg-gradient);
-            color: var(--text-color);
+            background-attachment: fixed; /* Le fond reste fixe au scroll */
+            color: var(--text-main);
             margin: 0;
             display: flex;
             flex-direction: column;
@@ -31,230 +39,329 @@
             overflow-x: hidden;
         }
 
-        /* Effet de verre (Glassmorphism) */
+        /* Responsive Container */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 1px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Glassmorphism Panel */
         .glass-panel {
-            background: var(--panel-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--panel-border);
-            border-radius: 15px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            margin: 10px;
+            transition: transform 0.3s ease;
         }
 
         header {
             width: 100%;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 0.5rem;
+            padding: 1rem 0;
             text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 1px;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.8rem;
-            color: var(--primary-accent);
-            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
-            letter-spacing: 1px;
+            font-size: 2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
+        /* Controls Section - "Awesome" styling */
         #controls {
-            margin: 10px 0;
             display: flex;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
-            padding: 0 12px;
-        }
-
-        button, select {
-            padding: 5px 10px;
-            border-radius: 5px; /* Boutons arrondis */
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            font-family: var(--font-main);
-        }
-
-        button:hover, select:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); }
-        
-        button#start-btn { 
-            background: linear-gradient(45deg, #11998e, #38ef7d); 
-            color: #fff; 
-        }
-        
-        button#next-btn { 
-            background: var(--primary-accent); 
-            color: #003; 
-            display: none; 
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
 
         select {
-            background: rgba(255,255,255,0.9);
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: none;
+            background: #fff;
             color: #333;
+            font-family: var(--font-main);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            padding-right: 2.5em;
         }
 
+        button {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: none;
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            text-transform: uppercase;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+
+        button#start-btn { 
+            background: var(--start-btn); 
+            color: #1d3557; 
+        }
+        
+        button#next-btn { 
+            background: var(--accent-gold); 
+            color: #1d3557; 
+            display: none; 
+        }
+
+        /* Layout Principal Responsive */
         #main-display {
             display: flex;
+            flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 40px;
-            width: 95%;
-            max-width: 1200px;
-            margin-bottom: 20px;
+            align-items: flex-start;
+            gap: 10px;
+            width: 100%;
         }
 
         .panel {
-            padding: 10px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex: 1 1 350px; /* Flex-basis 350px, grow, shrink */
+            max-width: 600px;
             min-width: 300px;
         }
         
-        h3 { margin-top: 0; color: #ddd; font-weight: 400; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px; width: 100%; text-align: center; }
+        h3 { 
+            margin-top: 0; 
+            color: #a8dadc; 
+            font-weight: 400; 
+            border-bottom: 1px solid rgba(255,255,255,0.2); 
+            padding-bottom: 10px; 
+            width: 100%; 
+            text-align: center; 
+            margin-bottom: 20px;
+        }
 
-        /* Canvas Portée */
-        #staff-container { width: 100%; max-width: 400px; height: 250px; position: relative; display: flex; justify-content: center; }
-        canvas#staff-canvas { background-color: rgba(255,255,255,0.95); border-radius: 8px; box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+        /* Canvas Portée Responsive */
+        #staff-container { 
+            width: 100%; 
+            height: auto; 
+            position: relative; 
+            display: flex; 
+            justify-content: center; 
+            background: rgba(255,255,255,0.9);
+            border-radius: 10px;
+            padding: 10px 0;
+        }
+        canvas#staff-canvas { 
+            max-width: 100%; 
+            height: auto; 
+        }
 
-        /* Clarinette Visuelle */
-        #fingering-container { width: 300px; height: 500px; position: relative; }
-        .clarinet-svg { height: 100%; width: auto; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+        /* Clarinette Visuelle Responsive */
+        #fingering-container { 
+            width: 100%; 
+            max-width: 300px; /* Taille max de la clarinette */
+            height: auto;
+            position: relative; 
+            display: flex;
+            justify-content: center;
+        }
+        .clarinet-svg { 
+            width: 100%; 
+            height: auto; 
+            max-height: 500px;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
+        }
         
         /* SVG Classes */
-        .key { fill: #bbb; stroke: #555; stroke-width: 1; transition: fill 0.2s; }
-        .key.active { fill: var(--primary-accent); stroke: #fff; filter: drop-shadow(0 0 5px var(--primary-accent)); }
-        .hole { fill: #222; stroke: #888; stroke-width: 2; }
-        .hole.closed { fill: var(--primary-accent); stroke: #fff; }
+        .key { fill: #cfd8dc; stroke: #455a64; stroke-width: 1; transition: fill 0.2s; }
+        .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 8px var(--primary-btn)); }
+        .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; }
+        .hole.closed { fill: var(--primary-btn); stroke: #fff; }
 
+        /* Feedback Zone */
         #feedback-area {
-            margin-top: 1px;
+            margin: 20px 0;
             text-align: center;
-            min-height: 80px;
+            min-height: 100px;
             width: 100%;
             max-width: 600px;
         }
 
-        .status-detected { color: #fff; font-size: 1rem; margin-bottom: 1px; }
-        .status-match { 
-            color: var(--success-color); 
-            font-weight: bold; 
-            font-size: 1.8rem; 
-            text-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .status-detected { 
+            color: #fff; 
+            font-size: 1.1rem; 
+            margin-bottom: 1px; 
+            font-weight: 300;
         }
         
-        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .status-match { 
+            color: var(--start-btn); 
+            font-weight: 700; 
+            font-size: 2.2rem; 
+            text-shadow: 0 0 15px rgba(6, 214, 160, 0.6);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: block;
+        }
+        
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
+        /* Tuner Bar Modernisée */
         #tuner-bar {
             width: 100%;
-            height: 18px;
-            background: rgba(0,0,0,0.5);
-            margin-top: 1px;
+            height: 15px;
+            background: rgba(0,0,0,0.4);
+            margin-top: 10px;
             position: relative;
-            border-radius: 10px;
+            border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
         }
         #tuner-indicator {
-            width: 10px;
+            width: 12px;
             height: 100%;
             background: #fff;
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             transition: left 0.1s linear, background-color 0.2s;
-            border-radius: 3px;
-            box-shadow: 0 0 5px #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #fff;
         }
         #center-marker {
             width: 2px;
             height: 100%;
-            background: var(--success-color);
+            background: var(--start-btn);
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1;
-            opacity: 0.7;
+            opacity: 0.8;
+        }
+        
+        /* Note Name Display */
+        #note-name-display {
+            margin-top: 15px; 
+            font-size: 2rem; 
+            font-weight: 700; 
+            color: var(--primary-btn);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Media Queries pour Mobile */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.5rem; }
+            #controls { flex-direction: column; align-items: stretch; gap: 10px; }
+            select, button { width: 100%; text-align: center; }
+            #main-display { gap: 10px; }
+            .panel { padding: 15px; margin: 5px; }
+            .clarinet-svg { max-height: 400px; }
         }
 
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Clarinet Trainer 🎵</h1>
-    <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 1px;">Microphone requis • Jouez la note <b>Rouge</b></div>
-</header>
+<div class="app-container">
+    <header>
+        <h1>Clarinette 🎵</h1>
+        <div style="font-size: 0.9rem; opacity: 0.9; font-weight: 300;">Microphone requis • Jouez la note <b style="color:var(--danger-color)">Rouge</b></div>
+    </header>
 
-<div id="controls">
-    <select id="mode-select">
-        <option value="single">Mode: 1 Note (Classique)</option>
-        <option value="series">Mode: Série (5 Notes)</option>
-    </select>
-    <select id="level-select">
-        <option value="1">Niveau 1: Chalumeau (Mi3 - La4)</option>
-        <option value="2">Niveau 2: Passage (La3 - Do5)</option>
-        <option value="3">Niveau 3: Clairon (Si4 - Do6)</option>
-        <option value="4">Niveau 4: Chromatique Complet</option>
-        <option value="5">Niveau 5: Altissimo & Sauts</option>
-    </select>
-    <button id="start-btn">Commencer</button>
-    <button id="next-btn">Note Suivante</button>
-</div>
-
-<div id="feedback-area">
-    <div id="instruction" style="font-size: 1.2rem; color: #fff;">Appuyez sur "Activer Micro" pour commencer.</div>
-    <div id="detected-note" class="status-detected">--</div>
-    <div id="tuner-bar"><div id="center-marker"></div><div id="tuner-indicator"></div></div>
-</div>
-
-<div id="main-display">
-    <div class="panel glass-panel">
-        <h3>Partition</h3>
-        <div id="staff-container">
-            <canvas id="staff-canvas" width="380" height="250"></canvas>
-        </div>
-        <div id="note-name-display" style="margin-top:5px; font-size:1.5rem; font-weight:bold; color:var(--primary-accent);"></div>
+    <div id="controls">
+        <select id="mode-select">
+            <option value="single">Mode: 1 Note</option>
+            <option value="series">Mode: Série 5 Notes</option>
+        </select>
+        <select id="level-select">
+            <option value="1">Niveau 1: Chalumeau (Mi3 - La4)</option>
+            <option value="2">Niveau 2: Passage (La3 - Do5)</option>
+            <option value="3">Niveau 3: Clairon (Si4 - Do6)</option>
+            <option value="4">Niveau 4: Chromatique Complet</option>
+            <option value="5">Niveau 5: Altissimo & Sauts</option>
+        </select>
+        <button id="start-btn">🎙️ Activer Micro</button>
+        <button id="next-btn">⏩ Suivante</button>
     </div>
 
-    <div class="panel glass-panel">
-        <h3>Doigté (Système Boehm)</h3>
-        <div id="fingering-container">
-            <svg class="clarinet-svg" viewBox="0 0 100 400" xmlns="http://www.w3.org/2000/svg">
-                <rect x="40" y="10" width="20" height="380" rx="10" fill="#111" stroke="#333"/>
-                
-                <circle id="key-R" class="key" cx="25" cy="40" r="6" />
-                <text x="5" y="45" fill="#888" font-size="8">12(R)</text>
+    <div id="feedback-area">
+        <div id="instruction" style="font-size: 1.3rem; font-weight: 600;">En attente du microphone...</div>
+        <div id="detected-note" class="status-detected">--</div>
+        <div id="tuner-bar"><div id="center-marker"></div><div id="tuner-indicator"></div></div>
+    </div>
 
-                <circle id="key-T" class="hole" cx="50" cy="55" r="5" />
-                <text x="75" y="60" fill="#888" font-size="8">T</text>
+    <div id="main-display">
+        <div class="panel glass-panel">
+            <h3>Partition</h3>
+            <div id="staff-container">
+                <canvas id="staff-canvas" width="380" height="250"></canvas>
+            </div>
+            <div id="note-name-display"></div>
+        </div>
 
-                <rect id="key-A" class="key" x="35" y="20" width="10" height="5" /> 
-                <rect id="key-Ab" class="key" x="35" y="28" width="10" height="5" /> 
-                
-                <circle id="key-L1" class="hole" cx="50" cy="80" r="5" />
-                <circle id="key-L2" class="hole" cx="50" cy="100" r="5" />
-                <circle id="key-L3" class="hole" cx="50" cy="120" r="5" />
-                
-                <rect id="key-L4-E" class="key" x="65" y="130" width="15" height="8" rx="2"/> 
-                <rect id="key-L4-F" class="key" x="65" y="140" width="15" height="8" rx="2"/> 
-                <rect id="key-L4-Fsharp" class="key" x="20" y="135" width="15" height="8" rx="2"/> 
-                
-                <circle id="key-R1" class="hole" cx="50" cy="180" r="5" />
-                <circle id="key-R2" class="hole" cx="50" cy="200" r="5" />
-                <circle id="key-R3" class="hole" cx="50" cy="220" r="5" />
+        <div class="panel glass-panel">
+            <h3>Doigté (Boehm)</h3>
+            <div id="fingering-container">
+                <svg class="clarinet-svg" viewBox="0 0 100 400" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="40" y="10" width="20" height="380" rx="10" fill="#181818" stroke="#333"/>
+                    
+                    <circle id="key-R" class="key" cx="25" cy="40" r="6" />
+                    <text x="5" y="45" fill="#888" font-size="8">12(R)</text>
 
-                <rect id="key-Side1" class="key" x="65" y="90" width="8" height="20" rx="2"/> 
+                    <circle id="key-T" class="hole" cx="50" cy="55" r="5" />
+                    <text x="75" y="60" fill="#888" font-size="8">T</text>
 
-                <rect id="key-R4-E" class="key" x="20" y="230" width="15" height="8" rx="2"/>
-                <rect id="key-R4-F" class="key" x="20" y="240" width="15" height="8" rx="2"/>
-                <rect id="key-R4-Fsharp" class="key" x="65" y="235" width="15" height="8" rx="2"/>
-                <rect id="key-R4-Gsharp" class="key" x="65" y="215" width="15" height="8" rx="2"/> 
-            </svg>
+                    <rect id="key-A" class="key" x="35" y="20" width="10" height="5" /> 
+                    <rect id="key-Ab" class="key" x="35" y="28" width="10" height="5" /> 
+                    
+                    <circle id="key-L1" class="hole" cx="50" cy="80" r="5" />
+                    <circle id="key-L2" class="hole" cx="50" cy="100" r="5" />
+                    <circle id="key-L3" class="hole" cx="50" cy="120" r="5" />
+                    
+                    <rect id="key-L4-E" class="key" x="65" y="130" width="15" height="8" rx="2"/> 
+                    <rect id="key-L4-F" class="key" x="65" y="140" width="15" height="8" rx="2"/> 
+                    <rect id="key-L4-Fsharp" class="key" x="20" y="135" width="15" height="8" rx="2"/> 
+                    
+                    <rect id="key-Side1" class="key" x="65" y="90" width="8" height="20" rx="2"/> 
+
+                    <circle id="key-R1" class="hole" cx="50" cy="180" r="5" />
+                    <circle id="key-R2" class="hole" cx="50" cy="200" r="5" />
+                    <circle id="key-R3" class="hole" cx="50" cy="220" r="5" />
+
+                    <rect id="key-R4-E" class="key" x="20" y="230" width="15" height="8" rx="2"/>
+                    <rect id="key-R4-F" class="key" x="20" y="240" width="15" height="8" rx="2"/>
+                    <rect id="key-R4-Fsharp" class="key" x="65" y="235" width="15" height="8" rx="2"/>
+                    <rect id="key-R4-Gsharp" class="key" x="65" y="215" width="15" height="8" rx="2"/> 
+                </svg>
+            </div>
         </div>
     </div>
 </div>
@@ -264,13 +371,19 @@
  * --- TRADUCTION ET DONNÉES ---
  */
 const FR_NOTES = {
-    "C": "Do", "C#": "Do#", "D": "Ré", "D#": "Ré#", "E": "Mi", "F": "Fa", 
-    "F#": "Fa#", "G": "Sol", "G#": "Sol#", "A": "La", "A#": "La#", "B": "Si"
+    "C": "Do", "C#": "Do#", "Db": "Ré♭",
+    "D": "Ré", "D#": "Ré#", "Eb": "Mi♭",
+    "E": "Mi", 
+    "F": "Fa", "F#": "Fa#", "Gb": "Sol♭",
+    "G": "Sol", "G#": "Sol#", "Ab": "La♭",
+    "A": "La", "A#": "La#", "Bb": "Si♭",
+    "B": "Si"
 };
 
 function getFrenchNoteName(noteKey) {
     // Ex: "F#4" -> notePart="F#", octavePart="4"
-    const match = noteKey.match(/^([A-G]#?)(\d)$/);
+    // Ex: "Bb3" -> notePart="Bb", octavePart="3"
+    const match = noteKey.match(/^([A-G][#b]?)(\d)$/);
     if (match) {
         const name = FR_NOTES[match[1]] || match[1];
         return `${name} ${match[2]}`;
@@ -314,22 +427,46 @@ const NOTES_DATA = {
     "C6": { freq: 932.33, keys: ["R", "T"] }
 };
 
+// AJOUT DES BÉMOLS (Enharmonie) pour affichage correct
+const ENHARMONICS = {
+    "Gb3": "F#3", "Ab3": "G#3", "Bb3": "A#3", "Db4": "C#4", "Eb4": "D#4",
+    "Gb4": "F#4", "Ab4": "G#4", "Bb4": "A#4", "Db5": "C#5", "Eb5": "D#5",
+    "Gb5": "F#5", "Ab5": "G#5", "Bb5": "A#5"
+};
+
+// Fusionner les bémols dans NOTES_DATA
+for (let [flat, sharp] of Object.entries(ENHARMONICS)) {
+    if (NOTES_DATA[sharp]) {
+        NOTES_DATA[flat] = NOTES_DATA[sharp];
+    }
+}
+
+// Mise à jour des Niveaux avec Bémols et Dièses comme demandé
 const LEVELS = {
-    1: ["E3", "F3", "G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4"], 
-    2: ["G3", "A3", "B3", "C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5"], 
-    3: ["C4", "D4", "E4", "F4", "G4", "A4", "B4", "C5", "D5", "E5", "F5", "G5"], 
-    4: ["C#4", "D#4", "F#4", "G#4", "A#4", "C#5", "D#5", "F#5", "G#5"], 
+    // Niveau 1: Chalumeau étendu avec simples altérations
+    1: ["E3", "F3", "F#3", "G3", "G#3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4"], 
+    
+    // Niveau 2: Chalumeau haut + Clairon bas + altérations communes
+    2: ["G3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5"], 
+    
+    // Niveau 3: Clairon complet avec altérations
+    3: ["C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5", "C#5", "D5", "Eb5", "E5", "F5", "F#5", "G5"], 
+    
+    // Niveau 4: Chromatique Complet (Mélange bémols et dièses aléatoire via la liste complète)
+    4: ["C#4", "Db4", "D#4", "Eb4", "F#4", "Gb4", "G#4", "Ab4", "A#4", "Bb4", "C#5", "Db5", "D#5", "Eb5", "F#5", "Gb5", "G#5", "Ab5"], 
+    
+    // Niveau 5: Tout
     5: Object.keys(NOTES_DATA) 
 };
 
 /**
  * --- ETAT DU JEU ---
  */
-let noteQueue = []; // Liste des notes à jouer (1 ou 5)
-let queueIndex = 0; // Index actuel dans la file
+let noteQueue = []; 
+let queueIndex = 0; 
 
 /**
- * --- MOTEUR AUDIO (Inchangé pour stabilité) ---
+ * --- MOTEUR AUDIO (INTACT) ---
  */
 let audioContext;
 let analyser;
@@ -353,13 +490,10 @@ async function initAudio() {
         updatePitch();
         
         document.getElementById('start-btn').style.display = 'none';
-        
-        // Affichage du bouton "Suivant" seulement en mode 1 note
         updateControlsVisibility();
+        document.getElementById('instruction').innerText = "Jouez pour valider !";
         
-        document.getElementById('instruction').innerText = "C'est parti !";
-        
-        startNewSequence(); // Lance le jeu
+        startNewSequence(); 
     } catch (err) {
         alert("Erreur Micro: " + err);
     }
@@ -409,7 +543,7 @@ function updatePitch() {
 }
 
 /**
- * --- LOGIQUE DE JEU (SÉRIE VS SINGLE) ---
+ * --- LOGIQUE DE JEU ---
  */
 
 function getRandomNote(level) {
@@ -427,7 +561,6 @@ function startNewSequence() {
     const count = (mode === 'series') ? 5 : 1;
     
     for(let i=0; i<count; i++) {
-        // Simple logique pour éviter la même note deux fois de suite dans la génération
         let newNote;
         do {
             newNote = getRandomNote(level);
@@ -439,75 +572,61 @@ function startNewSequence() {
 }
 
 function updateUI() {
-    // Reset status
     document.getElementById('detected-note').innerText = "...";
     document.getElementById('tuner-indicator').style.left = "50%";
     document.getElementById('tuner-indicator').style.backgroundColor = "#fff";
 
     const currentNote = noteQueue[queueIndex];
     
-    // Affichage Canvas
     drawStaff(noteQueue, queueIndex);
     
-    // Affichage Doigté (seulement pour la note courante)
     if(currentNote) {
         showFingering(currentNote);
         document.getElementById('note-name-display').innerText = getFrenchNoteName(currentNote);
     } else {
-        // Fin de série
         document.getElementById('note-name-display').innerText = "Série terminée !";
     }
 }
 
 function checkNote(detectedFreq) {
-    // Si série finie ou pas commencée
     if (queueIndex >= noteQueue.length) return;
 
     const currentTarget = noteQueue[queueIndex];
     const targetData = NOTES_DATA[currentTarget];
     const targetFreq = targetData.freq;
     
-    // const centsDiff = 1200 * Math.log2(detectedFreq / targetFreq); // Valeur d'Origine
-    const centsDiff = 600 * Math.log2(detectedFreq / targetFreq); // Modif Gillou Précision plus tolérante
+    const centsDiff = 600 * Math.log2(detectedFreq / targetFreq); 
 
-    // Tuner UI
     const tunerIndicator = document.getElementById('tuner-indicator');
     let displayCents = Math.max(-50, Math.min(50, centsDiff));
     tunerIndicator.style.left = `${50 + displayCents}%`;
     
     const displayElement = document.getElementById('detected-note');
     
-    // Détection de succès (+/- 15 cents) (augmenté à +/- 20 Cents)
     if (Math.abs(centsDiff) < 20) {
-        tunerIndicator.style.backgroundColor = "var(--success-color)";
+        tunerIndicator.style.backgroundColor = "var(--note-success)";
         
-        // Verrouillage temporaire pour éviter les doubles déclenchements rapides
         if (!displayElement.dataset.successLocked) {
             displayElement.dataset.successLocked = "true";
             
-            // Logique selon le mode
             const mode = document.getElementById('mode-select').value;
             
             if (mode === 'series') {
-                // Mode Série : On avance tout de suite
                 displayElement.innerHTML = `<span class="status-match">${getFrenchNoteName(currentTarget)} OK!</span>`;
                 queueIndex++;
                 
-                // Petit délai visuel très court
                 setTimeout(() => {
                     displayElement.dataset.successLocked = "";
                     if (queueIndex >= noteQueue.length) {
-                          // Fin de série : délai plus long avant nouvelle série
                           displayElement.innerHTML = `<span class="status-match" style="color:#fff">SÉRIE TERMINÉE !</span>`;
-                          drawStaff(noteQueue, queueIndex); // Redessine pour montrer tout vert
+                          drawStaff(noteQueue, queueIndex); 
                           setTimeout(startNewSequence, 1500);
                     } else {
                         updateUI();
                     }
-                }, 200); // Réactif
+                }, 200);
                 
             } else {
-                // Mode Single : Pause gratifiante
                 displayElement.innerHTML = `<span class="status-match">BRAVO !</span>`;
                 setTimeout(() => {
                     displayElement.dataset.successLocked = "";
@@ -517,23 +636,34 @@ function checkNote(detectedFreq) {
         }
     } else {
         displayElement.innerText = `Détecté: ${Math.round(detectedFreq)} Hz`;
-        tunerIndicator.style.backgroundColor = Math.abs(centsDiff) > 50 ? "var(--error-color)" : "#fff";
+        tunerIndicator.style.backgroundColor = Math.abs(centsDiff) > 50 ? "var(--danger-color)" : "#fff";
     }
 }
 
 /**
- * --- DESSIN CANVAS (MULTIPLE NOTES) ---
+ * --- DESSIN CANVAS (AVEC BÉMOLS) ---
  */
 const canvas = document.getElementById('staff-canvas');
 const ctx = canvas.getContext('2d');
 
 function drawStaff(notes, activeIndex) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Adapter le canvas au DPI
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
     
-    const startX = 40;
-    const endX = canvas.width - 40;
-    const staffY = 100; 
-    const lineSpacing = 15;
+    // Récupérer largeur/hauteur logiques
+    const width = rect.width;
+    const height = rect.height;
+
+    ctx.clearRect(0, 0, width, height);
+    
+    const startX = 20;
+    const endX = width - 20;
+    const staffY = 90; 
+    const lineSpacing = 14;
     
     // Lignes de portée
     ctx.strokeStyle = "#333";
@@ -544,41 +674,40 @@ function drawStaff(notes, activeIndex) {
     }
     
     // Clé de sol
-    ctx.font = "60px serif";
+    ctx.font = "50px serif";
     ctx.fillStyle = "#333";
-    ctx.fillText("𝄞", 10, staffY + 45);
+    ctx.fillText("𝄞", 10, staffY + 42);
 
-    // Dessin des notes
-    // Si 1 note : centrée. Si 5 notes : réparties.
-    let xSpacing = (canvas.width - 100) / (notes.length > 1 ? notes.length : 1);
-    let xOffset = (notes.length === 1) ? (canvas.width / 2) : 60;
+    let xOffset = (notes.length === 1) ? (width / 2) : 60;
 
-    // Mapping positions verticales
+    // Mapping positions verticales (ajout des bémols)
+    // NB: Les bémols occupent la même position "visuelle" que la note naturelle
+    // Ex: Bb3 est sur la ligne du Si (5.5), A#3 est sur l'interligne du La (6)
     const noteStepsFromTop = {
-        "C6": -2, "B5": -1.5, "A#5": -1, "A5": -1, "G#5": -0.5, "G5": -0.5,
-        "F#5": 0, "F5": 0, "E5": 0.5, "D#5": 1, "D5": 1, "C#5": 1.5, "C5": 1.5,
-        "B4": 2, "A#4": 2.5, "A4": 2.5, "G#4": 3, "G4": 3, "F#4": 3.5, "F4": 3.5,
-        "E4": 4, "D#4": 4.5, "D4": 4.5, "C#4": 5, "C4": 5, "B3": 5.5,
-        "A#3": 6, "A3": 6, "G#3": 6.5, "G3": 6.5, "F#3": 7, "F3": 7, "E3": 7.5
+        "C6": -2, "B5": -1.5, "Bb5": -1.5, "A#5": -1, "A5": -1, "Ab5": -1, "G#5": -0.5, "G5": -0.5, "Gb5": -0.5,
+        "F#5": 0, "F5": 0, "E5": 0.5, "Eb5": 0.5, "D#5": 1, "D5": 1, "Db5": 1, "C#5": 1.5, "C5": 1.5,
+        "B4": 2, "Bb4": 2, "A#4": 2.5, "A4": 2.5, "Ab4": 2.5, "G#4": 3, "G4": 3, "Gb4": 3, "F#4": 3.5, "F4": 3.5,
+        "E4": 4, "Eb4": 4, "D#4": 4.5, "D4": 4.5, "Db4": 4.5, "C#4": 5, "C4": 5, "B3": 5.5, "Bb3": 5.5,
+        "A#3": 6, "A3": 6, "Ab3": 6, "G#3": 6.5, "G3": 6.5, "Gb3": 6.5, "F#3": 7, "F3": 7, "E3": 7.5
     };
 
     notes.forEach((noteName, idx) => {
         const steps = noteStepsFromTop[noteName];
         const noteY = staffY + (steps * lineSpacing);
         
-        // Calcul position X
+        // Calcul position X responsive
         let noteX = xOffset;
         if (notes.length > 1) {
-            noteX = 80 + (idx * ((canvas.width - 120) / (notes.length - 1)));
+            noteX = 70 + (idx * ((width - 100) / (notes.length - 1)));
         }
 
         // Lignes supplémentaires
-        ctx.strokeStyle = "#333"; // Lignes toujours noires
+        ctx.strokeStyle = "#333"; 
         if (steps >= 5) { 
             for (let s = 5; s <= steps; s++) {
                 if (s % 1 === 0) {
                     let ly = staffY + (s * lineSpacing);
-                    ctx.beginPath(); ctx.moveTo(noteX - 15, ly); ctx.lineTo(noteX + 15, ly); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(noteX - 12, ly); ctx.lineTo(noteX + 12, ly); ctx.stroke();
                 }
             }
         }
@@ -586,47 +715,42 @@ function drawStaff(notes, activeIndex) {
             for (let s = -1; s >= steps; s--) {
                 if (s % 1 === 0) {
                     let ly = staffY + (s * lineSpacing);
-                    ctx.beginPath(); ctx.moveTo(noteX - 15, ly); ctx.lineTo(noteX + 15, ly); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(noteX - 12, ly); ctx.lineTo(noteX + 12, ly); ctx.stroke();
                 }
             }
         }
 
-        // COULEUR DE LA NOTE
-        // Passé (idx < activeIndex) = Vert
-        // Actuel (idx == activeIndex) = Rouge
-        // Futur (idx > activeIndex) = Noir
-        let noteColor = "var(--pending-note-color)";
-        if (idx < activeIndex) noteColor = "var(--success-color)";
-        else if (idx === activeIndex) noteColor = "var(--current-note-color)";
+        // COULEURS
+        let noteColor = "var(--note-pending)";
+        if (idx < activeIndex) noteColor = "var(--note-success)";
+        else if (idx === activeIndex) noteColor = "var(--note-current)";
 
         // Dessin Tête
         ctx.beginPath();
-        ctx.ellipse(noteX, noteY, 10, 8, 0, 0, 2 * Math.PI);
+        ctx.ellipse(noteX, noteY, 9, 7, 0, 0, 2 * Math.PI);
         
-        // Hack pour utiliser les variables CSS dans le canvas
-        if(noteColor.startsWith("var")) {
-            if(noteColor.includes("success")) ctx.fillStyle = "#2ecc71";
-            else if(noteColor.includes("current")) ctx.fillStyle = "#e74c3c";
-            else ctx.fillStyle = "#000";
-        } else {
-            ctx.fillStyle = noteColor;
-        }
+        // Résolution couleur canvas
+        if(noteColor.includes("success")) ctx.fillStyle = "#06d6a0";
+        else if(noteColor.includes("current")) ctx.fillStyle = "#ef476f";
+        else ctx.fillStyle = "#000";
+        
         ctx.fill();
 
-        // Dièse (#)
+        // Altérations (Dièse ou Bémol)
+        ctx.font = "22px Arial";
         if (noteName.includes("#")) {
-            ctx.font = "20px Arial";
-            ctx.fillText("♯", noteX - 25, noteY + 5);
+            ctx.fillText("♯", noteX - 22, noteY + 6);
+        } else if (noteName.includes("b")) {
+            ctx.fillText("♭", noteX - 22, noteY + 4);
         }
     });
 }
 
 function showFingering(noteName) {
-    // CORRECTION ICI : On vide le style inline pour laisser le CSS (classes .key .hole) gérer les couleurs
     document.querySelectorAll('.key, .hole').forEach(el => {
-        el.style.fill = "";   // On enlève le style forcé
-        el.style.stroke = ""; // On enlève le style forcé
-        el.classList.remove('active', 'closed'); // On enlève l'état actif
+        el.style.fill = ""; 
+        el.style.stroke = ""; 
+        el.classList.remove('active', 'closed'); 
     });
 
     const data = NOTES_DATA[noteName];
@@ -636,9 +760,9 @@ function showFingering(noteName) {
         const el = document.getElementById(`key-${keyId}`);
         if (el) {
             if (el.classList.contains('hole')) {
-                el.classList.add('closed'); // CSS gère la couleur via classe
+                el.classList.add('closed'); 
             } else {
-                el.classList.add('active'); // CSS gère la couleur via classe
+                el.classList.add('active'); 
             }
         }
     });
@@ -646,11 +770,16 @@ function showFingering(noteName) {
 
 // Events
 document.getElementById('start-btn').addEventListener('click', initAudio);
-document.getElementById('next-btn').addEventListener('click', startNewSequence); // Bouton manuel
+document.getElementById('next-btn').addEventListener('click', startNewSequence); 
 document.getElementById('level-select').addEventListener('change', () => { if(isListening) startNewSequence(); });
 document.getElementById('mode-select').addEventListener('change', () => { 
     updateControlsVisibility();
     if(isListening) startNewSequence(); 
+});
+
+// Redimensionnement de la fenêtre pour le canvas
+window.addEventListener('resize', () => {
+    if(noteQueue.length > 0) drawStaff(noteQueue, queueIndex);
 });
 
 </script>
