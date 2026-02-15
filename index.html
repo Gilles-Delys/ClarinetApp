@@ -2,21 +2,21 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Clarinette</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Palette Méditerranée Awesome (Conservée) */
+            /* Palette Méditerranée Awesome */
             --bg-gradient: linear-gradient(135deg, #0b4aa7 0%, #0f4ba5 35%, #1c71bb 70%, #27a4ec 100%);
             --glass-bg: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.25);
             
             --text-main: #ffffff;
-            --primary-btn: #00b4d8; /* Bleu Lagon */
-            --start-btn: #06d6a0;   /* Vert Menthe */
-            --danger-color: #ef476f; /* Rouge Pastel */
+            --primary-btn: #00b4d8;
+            --start-btn: #06d6a0;
+            --danger-color: #ef476f;
             --accent-gold: #ffd166;
             
             --note-current: #ef476f;
@@ -42,7 +42,7 @@
         .app-container {
             width: 100%;
             max-width: 1200px;
-            padding: 5px; /* Réduit pour mobile */
+            padding: 4px; /* Très réduit pour mobile */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -54,61 +54,61 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            margin: 5px;
+            border-radius: 15px; /* Rayon réduit */
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
+            margin: 4px;
             transition: transform 0.3s ease;
         }
 
         header {
             width: 100%;
-            padding: 0.5rem 0; /* Réduit */
+            padding: 2px 0;
             text-align: center;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         h1 {
             margin: 0;
-            font-size: 1.8rem;
+            font-size: 1.4rem; /* Plus petit */
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Controls Section - Optimisé */
+        /* Controls Section - Optimisé Compact */
         #controls {
             display: flex;
-            gap: 10px;
+            gap: 5px;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
             width: 100%;
-            padding: 10px;
+            padding: 6px;
             background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            margin-bottom: 5px;
+            border-radius: 8px;
+            margin-bottom: 4px;
             box-sizing: border-box;
         }
 
         select {
-            padding: 8px 10px;
-            border-radius: 10px;
+            padding: 4px 8px;
+            border-radius: 6px;
             border: none;
             background: #fff;
             color: #333;
             font-family: var(--font-main);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            appearance: none; /* Nettoyage visuel */
-            /* Flèche SVG custom conservée */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            appearance: none;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
-            background-position: right .7em top 50%;
-            background-size: .65em auto;
-            padding-right: 2.5em;
+            background-position: right .5em top 50%;
+            background-size: .55em auto;
+            padding-right: 1.5em;
+            height: 32px; /* Force height compact */
         }
 
         .slider-container {
@@ -116,33 +116,36 @@
             flex-direction: column;
             align-items: center;
             background: rgba(255,255,255,0.1);
-            padding: 5px 10px;
-            border-radius: 10px;
+            padding: 2px 6px;
+            border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.2);
+            height: 32px;
+            justify-content: center;
         }
         
         .slider-label {
-            font-size: 0.75rem;
+            font-size: 0.6rem;
             margin-bottom: 0;
             color: #a8dadc;
+            line-height: 1;
         }
 
         input[type=range] {
             -webkit-appearance: none;
-            width: 100px; /* Plus compact */
+            width: 80px; 
             background: transparent;
-            margin: 5px 0;
+            margin: 2px 0;
+            height: 10px;
         }
         
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 14px;
-            width: 14px;
+            height: 12px;
+            width: 12px;
             border-radius: 50%;
             background: var(--accent-gold);
             cursor: pointer;
-            margin-top: -5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            margin-top: -4px;
         }
         
         input[type=range]::-webkit-slider-runnable-track {
@@ -154,31 +157,25 @@
         }
 
         button {
-            padding: 8px 12px;
-            border-radius: 10px;
+            padding: 0 10px;
+            height: 32px;
+            border-radius: 6px;
             border: none;
             font-family: var(--font-main);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         button:active { transform: scale(0.95); }
-        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-
-        button#start-btn { 
-            background: var(--start-btn); 
-            color: #1d3557; 
-        }
-        
-        button#next-btn { 
-            background: var(--accent-gold); 
-            color: #1d3557; 
-            display: none; 
-        }
+        button#start-btn { background: var(--start-btn); color: #1d3557; }
+        button#next-btn { background: var(--accent-gold); color: #1d3557; display: none; }
 
         /* Layout Principal */
         #main-display {
@@ -187,71 +184,68 @@
             flex-wrap: wrap;
             justify-content: center;
             align-items: flex-start;
-            gap: 10px;
+            gap: 6px;
             width: 100%;
         }
 
         .panel {
-            padding: 15px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1 1 300px; /* Réduit le flex-basis pour permettre de côte-à-côte sur tablette */
-            min-width: 0; /* Important pour le shrink flexbox */
-            width: 100%; /* Force width pour mobile */
+            flex: 1 1 300px;
+            min-width: 0;
+            width: 100%;
             max-width: 600px;
             box-sizing: border-box;
         }
         
         h3 { 
-            margin-top: 0; 
+            margin: 2px 0 6px 0; 
             color: #a8dadc; 
             font-weight: 400; 
             border-bottom: 1px solid rgba(255,255,255,0.2); 
-            padding-bottom: 5px; 
+            padding-bottom: 2px; 
             width: 100%; 
             text-align: center; 
-            margin-bottom: 10px;
-            font-size: 1rem;
+            font-size: 0.9rem;
         }
 
-        /* Canvas Portée Container & Overlay System */
+        /* Canvas Portée Container */
         #staff-container { 
             width: 100%; 
             height: auto; 
-            position: relative; /* Clé pour l'overlay absolu */
+            position: relative; 
             display: flex; 
             justify-content: center; 
             background: rgba(255,255,255,0.9);
-            border-radius: 10px;
-            padding: 10px 0;
-            overflow: hidden; /* Garde l'overlay dans les coins arrondis */
+            border-radius: 8px;
+            padding: 5px 0;
+            overflow: hidden; 
         }
         
         canvas#staff-canvas { 
-            max-width: 100%; 
-            height: auto; 
-            z-index: 1; /* Derrière le message */
+            width: 100%; 
+            height: 200px; /* Hauteur fixe CSS, canvas interne géré par JS */
+            z-index: 1; 
         }
 
-        /* NOUVEAU: Overlay pour les messages BRAVO/Série Terminée */
         #detected-note {
             position: absolute;
-            top: 5px;
-            right: 5px; /* Coin haut droit */
+            top: 4px;
+            right: 4px;
             z-index: 10;
-            /* Style badge */
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.9rem;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
             text-align: center;
-            pointer-events: none; /* Clic au travers */
+            pointer-events: none;
         }
 
         /* Clarinette Visuelle */
         #fingering-container { 
             width: 100%; 
-            max-width: 250px; /* Un peu plus petit pour mobile */
+            max-width: 180px; /* Plus étroit pour mobile */
             height: auto;
             position: relative; 
             display: flex;
@@ -260,38 +254,37 @@
         .clarinet-svg { 
             width: 100%; 
             height: auto; 
-            max-height: 500px;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
+            max-height: 300px; /* Limite hauteur */
+            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); 
         }
         
         .key { fill: #cfd8dc; stroke: #455a64; stroke-width: 1; transition: fill 0.2s; }
-        .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 8px var(--primary-btn)); }
+        .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 6px var(--primary-btn)); }
         .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; }
         .hole.closed { fill: var(--primary-btn); stroke: #fff; }
 
-        /* Feedback Area (Juste pour le tuner maintenant) */
+        /* Feedback Area */
         #feedback-area {
-            margin: 5px 0 15px 0;
+            margin: 4px 0 8px 0;
             text-align: center;
             width: 100%;
             max-width: 600px;
         }
 
-        /* Styles spécifiques aux messages */
         .status-detected { 
-            color: #333; /* Noir pour être lisible sur fond blanc (canvas) */
+            color: #333; 
             font-weight: 600;
-            background: rgba(255,255,255,0.8); /* Petit fond pour lisibilité */
+            background: rgba(255,255,255,0.8);
             border: 1px solid #ccc;
         }
         
         .status-match { 
-            color: #fff; /* Texte blanc */
-            background-color: var(--start-btn); /* Fond Vert */
-            padding: 4px 12px;
-            border-radius: 15px;
+            color: #fff; 
+            background-color: var(--start-btn); 
+            padding: 2px 10px;
+            border-radius: 12px;
             font-weight: 700; 
-            font-size: 1rem; /* Plus petit pour s'incruster */
+            font-size: 0.9rem;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: inline-block;
@@ -302,16 +295,16 @@
         /* Tuner Bar */
         #tuner-bar {
             width: 100%;
-            height: 12px; /* Plus fin */
+            height: 8px; /* Très fin */
             background: rgba(0,0,0,0.4);
-            margin-top: 5px;
+            margin-top: 2px;
             position: relative;
-            border-radius: 20px;
+            border-radius: 10px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
         }
         #tuner-indicator {
-            width: 10px;
+            width: 8px;
             height: 100%;
             background: #fff;
             position: absolute;
@@ -319,7 +312,7 @@
             transform: translateX(-50%);
             transition: left 0.1s linear, background-color 0.2s;
             border-radius: 50%;
-            box-shadow: 0 0 8px #fff;
+            box-shadow: 0 0 5px #fff;
         }
         #center-marker {
             width: 2px;
@@ -333,50 +326,51 @@
         }
         
         #note-name-display {
-            margin-top: 5px; 
-            font-size: 1.5rem; 
+            margin-top: 2px; 
+            font-size: 1.2rem; 
             font-weight: 700; 
             color: var(--primary-btn);
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            min-height: 1.5em; /* Garde la place pour éviter saut */
+            min-height: 1.5em;
         }
 
-        /* Media Queries SPÉCIFIQUE MOBILE (A52 etc) */
-        @media (max-width: 768px) {
-            h1 { font-size: 1.4rem; }
-            
-            /* Grille pour les contrôles sur mobile : Gain de place énorme */
+        /* Media Queries SPÉCIFIQUE MOBILE */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.2rem; }
+            #instruction { font-size: 0.75rem !important; }
+
+            /* Grille compacte */
             #controls { 
                 display: grid;
-                grid-template-columns: 1fr 1fr; /* 2 colonnes */
-                gap: 8px;
-                padding: 8px;
+                grid-template-columns: 1fr 1fr 1fr; /* 3 colonnes pour gagner de la place */
+                gap: 4px;
+                padding: 4px;
             }
             
-            /* Les éléments prennent toute la largeur de leur cellule de grille */
-            select, button, .slider-container { 
+            select { grid-column: span 1; font-size: 0.75rem; padding: 2px 4px; height: 30px; }
+            #mode-select { grid-column: 1 / span 2; } /* Prend 2 places */
+            #level-select { grid-column: 3 / span 1; } 
+            
+            .slider-container { 
+                grid-column: 1 / span 2; 
+                height: 30px; 
+            }
+            
+            #start-btn, #next-btn { 
+                grid-column: 3 / span 1; 
                 width: 100%; 
-                font-size: 0.8rem; /* Texte plus petit */
-                padding: 6px 2px;
-                height: 40px; /* Hauteur uniforme */
-                display: flex;
-                justify-content: center;
-                align-items: center;
+                font-size: 0.75rem; 
+                height: 30px;
             }
-            
-            /* Exceptions pour la grille */
-            #mode-select { grid-column: 1 / span 1; }
-            #level-select { grid-column: 2 / span 1; }
-            .slider-container { grid-column: 1 / span 1; }
-            #start-btn, #next-btn { grid-column: 2 / span 1; }
 
-            /* Mise en page verticale pour les panneaux */
             #main-display { flex-direction: column; align-items: center; }
-            .panel { width: 100%; margin: 0 0 10px 0; padding: 10px; }
+            .panel { width: 100%; margin: 0 0 6px 0; padding: 6px; }
             
-            .clarinet-svg { max-height: 350px; }
+            .clarinet-svg { max-height: 280px; }
+            
+            /* Canvas ajusté */
+            canvas#staff-canvas { height: 160px; } /* Moins haut sur mobile */
         }
-
     </style>
 </head>
 <body>
@@ -402,11 +396,11 @@
 
         <div class="slider-container">
             <label for="noise-gate" class="slider-label">Bruit (Seuil)</label>
-            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05" title="Ajuster sensibilité">
+            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05">
         </div>
 
         <button id="start-btn">🎙️ Micro</button>
-        <button id="next-btn">⏩ Suiv.</button>
+        <button id="next-btn">⏩</button>
     </div>
 
     <div id="feedback-area">
@@ -418,8 +412,7 @@
             <h3>Partition</h3>
             <div id="staff-container">
                 <div id="detected-note" class="status-detected">--</div>
-                
-                <canvas id="staff-canvas" width="380" height="250"></canvas>
+                <canvas id="staff-canvas"></canvas>
             </div>
             <div id="note-name-display"></div>
         </div>
@@ -586,7 +579,13 @@ async function initAudio() {
 
 function updateControlsVisibility() {
     const mode = document.getElementById('mode-select').value;
-    document.getElementById('next-btn').style.display = (mode === 'single' && isListening) ? 'inline-block' : 'none'; // Grid gère le reste
+    // Grid gère l'affichage, on joue juste sur le display none/block
+    const nextBtn = document.getElementById('next-btn');
+    if (mode === 'single' && isListening) {
+        nextBtn.style.display = 'inline-flex'; // inline-flex pour centrer le texte
+    } else {
+        nextBtn.style.display = 'none';
+    }
 }
 
 function autoCorrelate(buf, sampleRate) {
@@ -736,7 +735,7 @@ function checkNote(detectedFreq) {
 }
 
 /**
- * --- DESSIN CANVAS (AVEC BÉMOLS) ---
+ * --- DESSIN CANVAS (AVEC BÉMOLS ET CENTRAGE DYNAMIQUE) ---
  */
 const canvas = document.getElementById('staff-canvas');
 const ctx = canvas.getContext('2d');
@@ -744,6 +743,8 @@ const ctx = canvas.getContext('2d');
 function drawStaff(notes, activeIndex) {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
+    
+    // Ajustement de la résolution
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
@@ -753,10 +754,16 @@ function drawStaff(notes, activeIndex) {
 
     ctx.clearRect(0, 0, width, height);
     
+    const isSmallScreen = width < 400; // Détection petit écran
+    const lineSpacing = isSmallScreen ? 11 : 14; // Réduit l'espace sur mobile pour tout faire rentrer
+    
+    // Calcul pour centrer la portée verticalement
+    // La portée fait 4 espaces de haut. Le centre de la portée est à 2 * lineSpacing + staffY
+    // On veut que ce centre soit à height / 2.
+    const staffY = (height / 2) - (2 * lineSpacing);
+    
     const startX = 20;
     const endX = width - 20;
-    const staffY = 90; 
-    const lineSpacing = 14;
     
     // Lignes de portée
     ctx.strokeStyle = "#333";
@@ -767,9 +774,11 @@ function drawStaff(notes, activeIndex) {
     }
     
     // Clé de sol
-    ctx.font = "50px serif";
+    ctx.font = isSmallScreen ? "40px serif" : "50px serif";
     ctx.fillStyle = "#333";
-    ctx.fillText("𝄞", 10, staffY + 42);
+    // Ajustement position clé selon taille
+    const clefOffset = isSmallScreen ? 34 : 42;
+    ctx.fillText("𝄞", 10, staffY + clefOffset);
 
     let xOffset = (notes.length === 1) ? (width / 2) : 60;
 
@@ -791,6 +800,8 @@ function drawStaff(notes, activeIndex) {
         }
 
         ctx.strokeStyle = "#333"; 
+        // Lignes supplémentaires (Ledger lines)
+        // Bas
         if (steps >= 5) { 
             for (let s = 5; s <= steps; s++) {
                 if (s % 1 === 0) {
@@ -799,6 +810,7 @@ function drawStaff(notes, activeIndex) {
                 }
             }
         }
+        // Haut
         if (steps <= -1) { 
             for (let s = -1; s >= steps; s--) {
                 if (s % 1 === 0) {
@@ -813,7 +825,10 @@ function drawStaff(notes, activeIndex) {
         else if (idx === activeIndex) noteColor = "var(--note-current)";
 
         ctx.beginPath();
-        ctx.ellipse(noteX, noteY, 9, 7, 0, 0, 2 * Math.PI);
+        // Taille note légèrement réduite si petit écran
+        const noteRadiusX = isSmallScreen ? 8 : 9;
+        const noteRadiusY = isSmallScreen ? 6 : 7;
+        ctx.ellipse(noteX, noteY, noteRadiusX, noteRadiusY, 0, 0, 2 * Math.PI);
         
         if(noteColor.includes("success")) ctx.fillStyle = "#06d6a0";
         else if(noteColor.includes("current")) ctx.fillStyle = "#ef476f";
@@ -821,7 +836,7 @@ function drawStaff(notes, activeIndex) {
         
         ctx.fill();
 
-        ctx.font = "22px Arial";
+        ctx.font = isSmallScreen ? "18px Arial" : "22px Arial";
         if (noteName.includes("#")) {
             ctx.fillText("♯", noteX - 22, noteY + 6);
         } else if (noteName.includes("b")) {
