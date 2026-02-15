@@ -8,7 +8,7 @@
     
     <style>
         :root {
-            /* Palette Méditerranée Awesome */
+            /* Palette Méditerranée Awesome (Conservée) */
             --bg-gradient: linear-gradient(135deg, #0b4aa7 0%, #0f4ba5 35%, #1c71bb 70%, #27a4ec 100%);
             --glass-bg: rgba(255, 255, 255, 0.15);
             --glass-border: rgba(255, 255, 255, 0.25);
@@ -29,7 +29,7 @@
         body {
             font-family: var(--font-main);
             background: var(--bg-gradient);
-            background-attachment: fixed; /* Le fond reste fixe au scroll */
+            background-attachment: fixed;
             color: var(--text-main);
             margin: 0;
             display: flex;
@@ -39,18 +39,16 @@
             overflow-x: hidden;
         }
 
-        /* Responsive Container */
         .app-container {
             width: 100%;
             max-width: 1200px;
-            padding: 1px;
+            padding: 5px; /* Réduit pour mobile */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* Glassmorphism Panel */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
@@ -58,30 +56,30 @@
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            margin: 10px;
+            margin: 5px;
             transition: transform 0.3s ease;
         }
 
         header {
             width: 100%;
-            padding: 1rem 0;
+            padding: 0.5rem 0; /* Réduit */
             text-align: center;
-            margin-bottom: 1px;
+            margin-bottom: 5px;
         }
 
         h1 {
             margin: 0;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 2px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Controls Section - "Awesome" styling */
+        /* Controls Section - Optimisé */
         #controls {
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
             align-items: center;
@@ -89,21 +87,23 @@
             padding: 10px;
             background: rgba(0,0,0,0.2);
             border-radius: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            box-sizing: border-box;
         }
 
         select {
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 10px;
             border: none;
             background: #fff;
             color: #333;
             font-family: var(--font-main);
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            appearance: none;
+            appearance: none; /* Nettoyage visuel */
+            /* Flèche SVG custom conservée */
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
             background-repeat: no-repeat;
             background-position: right .7em top 50%;
@@ -111,37 +111,37 @@
             padding-right: 2.5em;
         }
 
-        /* Style spécifique pour le slider de bruit */
         .slider-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             background: rgba(255,255,255,0.1);
-            padding: 5px 12px;
+            padding: 5px 10px;
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,0.2);
         }
         
         .slider-label {
-            font-size: 0.8rem;
-            margin-bottom: 2px;
+            font-size: 0.75rem;
+            margin-bottom: 0;
             color: #a8dadc;
         }
 
         input[type=range] {
             -webkit-appearance: none;
-            width: 120px;
+            width: 100px; /* Plus compact */
             background: transparent;
+            margin: 5px 0;
         }
         
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
+            height: 14px;
+            width: 14px;
             border-radius: 50%;
             background: var(--accent-gold);
             cursor: pointer;
-            margin-top: -6px;
+            margin-top: -5px;
             box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
         
@@ -154,11 +154,11 @@
         }
 
         button {
-            padding: 10px 12px;
+            padding: 8px 12px;
             border-radius: 10px;
             border: none;
             font-family: var(--font-main);
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -180,25 +180,27 @@
             display: none; 
         }
 
-        /* Layout Principal Responsive */
+        /* Layout Principal */
         #main-display {
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
             align-items: flex-start;
-            gap: 00px;
+            gap: 10px;
             width: 100%;
         }
 
         .panel {
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex: 1 1 350px; /* Flex-basis 350px, grow, shrink */
+            flex: 1 1 300px; /* Réduit le flex-basis pour permettre de côte-à-côte sur tablette */
+            min-width: 0; /* Important pour le shrink flexbox */
+            width: 100%; /* Force width pour mobile */
             max-width: 600px;
-            min-width: 300px;
+            box-sizing: border-box;
         }
         
         h3 { 
@@ -206,36 +208,54 @@
             color: #a8dadc; 
             font-weight: 400; 
             border-bottom: 1px solid rgba(255,255,255,0.2); 
-            padding-bottom: 10px; 
+            padding-bottom: 5px; 
             width: 100%; 
             text-align: center; 
             margin-bottom: 10px;
+            font-size: 1rem;
         }
 
-        /* Canvas Portée Responsive */
+        /* Canvas Portée Container & Overlay System */
         #staff-container { 
             width: 100%; 
             height: auto; 
-            position: relative; 
+            position: relative; /* Clé pour l'overlay absolu */
             display: flex; 
             justify-content: center; 
             background: rgba(255,255,255,0.9);
             border-radius: 10px;
             padding: 10px 0;
+            overflow: hidden; /* Garde l'overlay dans les coins arrondis */
         }
+        
         canvas#staff-canvas { 
             max-width: 100%; 
             height: auto; 
+            z-index: 1; /* Derrière le message */
         }
 
-        /* Clarinette Visuelle Responsive */
+        /* NOUVEAU: Overlay pour les messages BRAVO/Série Terminée */
+        #detected-note {
+            position: absolute;
+            top: 5px;
+            right: 5px; /* Coin haut droit */
+            z-index: 10;
+            /* Style badge */
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            text-align: center;
+            pointer-events: none; /* Clic au travers */
+        }
+
+        /* Clarinette Visuelle */
         #fingering-container { 
             width: 100%; 
-            max-width: 300px; /* Taille max de la clarinette */
+            max-width: 250px; /* Un peu plus petit pour mobile */
             height: auto;
             position: relative; 
             display: flex;
-            justify-content: center;
+            justify-content: center; 
         }
         .clarinet-svg { 
             width: 100%; 
@@ -244,52 +264,54 @@
             filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5)); 
         }
         
-        /* SVG Classes */
         .key { fill: #cfd8dc; stroke: #455a64; stroke-width: 1; transition: fill 0.2s; }
         .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 8px var(--primary-btn)); }
         .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; }
         .hole.closed { fill: var(--primary-btn); stroke: #fff; }
 
-        /* Feedback Zone */
+        /* Feedback Area (Juste pour le tuner maintenant) */
         #feedback-area {
-            margin: 20px 0;
+            margin: 5px 0 15px 0;
             text-align: center;
-            min-height: 100px;
             width: 100%;
             max-width: 600px;
         }
 
+        /* Styles spécifiques aux messages */
         .status-detected { 
-            color: #fff; 
-            font-size: 1.1rem; 
-            margin-bottom: 5px; 
-            font-weight: 300;
+            color: #333; /* Noir pour être lisible sur fond blanc (canvas) */
+            font-weight: 600;
+            background: rgba(255,255,255,0.8); /* Petit fond pour lisibilité */
+            border: 1px solid #ccc;
         }
         
         .status-match { 
-            color: var(--start-btn); 
+            color: #fff; /* Texte blanc */
+            background-color: var(--start-btn); /* Fond Vert */
+            padding: 4px 12px;
+            border-radius: 15px;
             font-weight: 700; 
-            font-size: 2.2rem; 
-            text-shadow: 0 0 15px rgba(6, 214, 160, 0.6);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: block;
+            font-size: 1rem; /* Plus petit pour s'incruster */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
         }
         
         @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* Tuner Bar Modernisée */
+        /* Tuner Bar */
         #tuner-bar {
             width: 100%;
-            height: 12px;
+            height: 12px; /* Plus fin */
             background: rgba(0,0,0,0.4);
-            margin-top: 10px;
+            margin-top: 5px;
             position: relative;
             border-radius: 20px;
             overflow: hidden;
             border: 1px solid rgba(255,255,255,0.1);
         }
         #tuner-indicator {
-            width: 12px;
+            width: 10px;
             height: 100%;
             background: #fff;
             position: absolute;
@@ -310,24 +332,49 @@
             opacity: 0.8;
         }
         
-        /* Note Name Display */
         #note-name-display {
-            margin-top: 15px; 
-            font-size: 2rem; 
+            margin-top: 5px; 
+            font-size: 1.5rem; 
             font-weight: 700; 
             color: var(--primary-btn);
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            min-height: 1.5em; /* Garde la place pour éviter saut */
         }
 
-        /* Media Queries pour Mobile */
+        /* Media Queries SPÉCIFIQUE MOBILE (A52 etc) */
         @media (max-width: 768px) {
-            h1 { font-size: 1.5rem; }
-            #controls { flex-direction: column; align-items: stretch; gap: 10px; }
-            select, button, .slider-container { width: 100%; text-align: center; }
-            #main-display { gap: 10px; }
-            .panel { padding: 15px; margin: 5px; }
-            .clarinet-svg { max-height: 400px; }
-            input[type=range] { width: 100%; }
+            h1 { font-size: 1.4rem; }
+            
+            /* Grille pour les contrôles sur mobile : Gain de place énorme */
+            #controls { 
+                display: grid;
+                grid-template-columns: 1fr 1fr; /* 2 colonnes */
+                gap: 8px;
+                padding: 8px;
+            }
+            
+            /* Les éléments prennent toute la largeur de leur cellule de grille */
+            select, button, .slider-container { 
+                width: 100%; 
+                font-size: 0.8rem; /* Texte plus petit */
+                padding: 6px 2px;
+                height: 40px; /* Hauteur uniforme */
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            /* Exceptions pour la grille */
+            #mode-select { grid-column: 1 / span 1; }
+            #level-select { grid-column: 2 / span 1; }
+            .slider-container { grid-column: 1 / span 1; }
+            #start-btn, #next-btn { grid-column: 2 / span 1; }
+
+            /* Mise en page verticale pour les panneaux */
+            #main-display { flex-direction: column; align-items: center; }
+            .panel { width: 100%; margin: 0 0 10px 0; padding: 10px; }
+            
+            .clarinet-svg { max-height: 350px; }
         }
 
     </style>
@@ -337,34 +384,32 @@
 <div class="app-container">
     <header>
         <h1>Clarinette 🎵</h1>
-        <div style="font-size: 0.9rem; opacity: 0.9; font-weight: 300;">Microphone requis • Jouez la note <b style="color:var(--danger-color)">Rouge</b></div>
+        <div id="instruction" style="font-size: 0.85rem; opacity: 0.9; font-weight: 300; margin-top:2px;">Micro requis • Jouez la note <b style="color:var(--danger-color)">Rouge</b></div>
     </header>
 
     <div id="controls">
         <select id="mode-select">
-            <option value="single">Mode: 1 Note (Focus)</option>
-            <option value="series">Mode: Série (5 Notes)</option>
+            <option value="single">Mode: 1 Note</option>
+            <option value="series">Mode: Série (5)</option>
         </select>
         <select id="level-select">
-            <option value="1">Niveau 1: Chalumeau (Mi3 - La4 + Alter)</option>
-            <option value="2">Niveau 2: Passage (La3 - Do5 + Alter)</option>
-            <option value="3">Niveau 3: Clairon (Si4 - Do6 + Alter)</option>
-            <option value="4">Niveau 4: Chromatique Complet</option>
-            <option value="5">Niveau 5: Altissimo & Sauts</option>
+            <option value="1">Niv 1: Chalumeau</option>
+            <option value="2">Niv 2: Passage</option>
+            <option value="3">Niv 3: Clairon</option>
+            <option value="4">Niv 4: Chromatique</option>
+            <option value="5">Niv 5: Expert</option>
         </select>
 
         <div class="slider-container">
-            <label for="noise-gate" class="slider-label">Filtre Bruit</label>
-            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05" title="Ajuster la sensibilité du micro">
+            <label for="noise-gate" class="slider-label">Bruit (Seuil)</label>
+            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05" title="Ajuster sensibilité">
         </div>
 
-        <button id="start-btn">🎙️ Activer Micro</button>
-        <button id="next-btn">⏩ Suivante</button>
+        <button id="start-btn">🎙️ Micro</button>
+        <button id="next-btn">⏩ Suiv.</button>
     </div>
 
     <div id="feedback-area">
-        <div id="instruction" style="font-size: 1.3rem; font-weight: 600;">En attente du microphone...</div>
-        <div id="detected-note" class="status-detected">--</div>
         <div id="tuner-bar"><div id="center-marker"></div><div id="tuner-indicator"></div></div>
     </div>
 
@@ -372,6 +417,8 @@
         <div class="panel glass-panel">
             <h3>Partition</h3>
             <div id="staff-container">
+                <div id="detected-note" class="status-detected">--</div>
+                
                 <canvas id="staff-canvas" width="380" height="250"></canvas>
             </div>
             <div id="note-name-display"></div>
@@ -488,7 +535,7 @@ for (let [flat, sharp] of Object.entries(ENHARMONICS)) {
     }
 }
 
-// Mise à jour des Niveaux avec Bémols et Dièses
+// Mise à jour des Niveaux
 const LEVELS = {
     1: ["E3", "F3", "F#3", "G3", "G#3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4"], 
     2: ["G3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5"], 
@@ -539,7 +586,7 @@ async function initAudio() {
 
 function updateControlsVisibility() {
     const mode = document.getElementById('mode-select').value;
-    document.getElementById('next-btn').style.display = (mode === 'single' && isListening) ? 'inline-block' : 'none';
+    document.getElementById('next-btn').style.display = (mode === 'single' && isListening) ? 'inline-block' : 'none'; // Grid gère le reste
 }
 
 function autoCorrelate(buf, sampleRate) {
@@ -548,11 +595,9 @@ function autoCorrelate(buf, sampleRate) {
     for (let i = 0; i < size; i++) { let val = buf[i]; rms += val * val; }
     rms = Math.sqrt(rms / size);
     
-    // MODIFICATION ICI: UTILISATION DE LA VALEUR DU SLIDER
-    // Récupère la valeur du slider (entre 0.01 et 0.2)
+    // Valeur slider
     const noiseThreshold = parseFloat(document.getElementById('noise-gate').value);
     
-    // Si le volume (rms) est inférieur au seuil, on ignore (retourne -1)
     if (rms < noiseThreshold) return -1; 
 
     let r1 = 0, r2 = size - 1, thres = 0.2;
@@ -616,7 +661,12 @@ function startNewSequence() {
 }
 
 function updateUI() {
-    document.getElementById('detected-note').innerText = "...";
+    // Réinitialisation affichage
+    const displayElement = document.getElementById('detected-note');
+    displayElement.innerText = "Attente...";
+    displayElement.className = "status-detected";
+    displayElement.style.backgroundColor = "rgba(255,255,255,0.8)"; // Reset background
+
     document.getElementById('tuner-indicator').style.left = "50%";
     document.getElementById('tuner-indicator').style.backgroundColor = "#fff";
 
@@ -662,7 +712,7 @@ function checkNote(detectedFreq) {
                 setTimeout(() => {
                     displayElement.dataset.successLocked = "";
                     if (queueIndex >= noteQueue.length) {
-                          displayElement.innerHTML = `<span class="status-match" style="color:#fff">SÉRIE TERMINÉE !</span>`;
+                          displayElement.innerHTML = `<span class="status-match" style="background-color:var(--accent-gold); color:#1d3557;">TERMINÉ !</span>`;
                           drawStaff(noteQueue, queueIndex); 
                           setTimeout(startNewSequence, 1500);
                     } else {
@@ -679,7 +729,8 @@ function checkNote(detectedFreq) {
             }
         }
     } else {
-        displayElement.innerText = `Détecté: ${Math.round(detectedFreq)} Hz`;
+        displayElement.innerText = `${Math.round(detectedFreq)} Hz`;
+        displayElement.className = "status-detected"; // Reset class
         tunerIndicator.style.backgroundColor = Math.abs(centsDiff) > 50 ? "var(--danger-color)" : "#fff";
     }
 }
