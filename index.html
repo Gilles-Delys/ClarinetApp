@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clarinet Pro Trainer - Ultimate Blue</title>
+    <title>Clarinet Pro Trainer</title>
     <style>
         :root {
             /* Palette Awesome Blue */
@@ -44,7 +44,7 @@
         header {
             width: 100%;
             background: rgba(0, 0, 0, 0.3);
-            padding: 1.5rem;
+            padding: 0.5rem;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
@@ -58,17 +58,17 @@
         }
 
         #controls {
-            margin: 25px 0;
+            margin: 10px 0;
             display: flex;
-            gap: 15px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
-            padding: 0 10px;
+            padding: 0 12px;
         }
 
         button, select {
-            padding: 12px 24px;
-            border-radius: 50px; /* Boutons arrondis */
+            padding: 5px 10px;
+            border-radius: 5px; /* Boutons arrondis */
             border: none;
             cursor: pointer;
             font-size: 1rem;
@@ -100,21 +100,21 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 30px;
+            gap: 40px;
             width: 95%;
             max-width: 1200px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
         }
 
         .panel {
-            padding: 25px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-width: 300px;
         }
         
-        h3 { margin-top: 0; color: #ddd; font-weight: 400; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; width: 100%; text-align: center; }
+        h3 { margin-top: 0; color: #ddd; font-weight: 400; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2px; width: 100%; text-align: center; }
 
         /* Canvas Portée */
         #staff-container { width: 100%; max-width: 400px; height: 250px; position: relative; display: flex; justify-content: center; }
@@ -131,14 +131,14 @@
         .hole.closed { fill: var(--primary-accent); stroke: #fff; }
 
         #feedback-area {
-            margin-top: 20px;
+            margin-top: 1px;
             text-align: center;
             min-height: 80px;
             width: 100%;
             max-width: 600px;
         }
 
-        .status-detected { color: #aaa; font-size: 1rem; margin-bottom: 5px; }
+        .status-detected { color: #fff; font-size: 1rem; margin-bottom: 1px; }
         .status-match { 
             color: var(--success-color); 
             font-weight: bold; 
@@ -153,7 +153,7 @@
             width: 100%;
             height: 18px;
             background: rgba(0,0,0,0.5);
-            margin-top: 15px;
+            margin-top: 1px;
             position: relative;
             border-radius: 10px;
             overflow: hidden;
@@ -186,8 +186,8 @@
 <body>
 
 <header>
-    <h1>Clarinet Trainer 🎵 Ultimate</h1>
-    <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 5px;">Microphone requis • Jouez la note <b>Rouge</b></div>
+    <h1>Clarinet Trainer 🎵</h1>
+    <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 1px;">Microphone requis • Jouez la note <b>Rouge</b></div>
 </header>
 
 <div id="controls">
@@ -202,7 +202,7 @@
         <option value="4">Niveau 4: Chromatique Complet</option>
         <option value="5">Niveau 5: Altissimo & Sauts</option>
     </select>
-    <button id="start-btn">Activer Micro & Commencer</button>
+    <button id="start-btn">Commencer</button>
     <button id="next-btn">Note Suivante</button>
 </div>
 
@@ -217,8 +217,15 @@
         <h3>Partition</h3>
         <div id="staff-container">
             <canvas id="staff-canvas" width="380" height="250"></canvas>
+            <!-- Script directement dans la page -->
+            <script>
+            // Code JavaScript
+            //alert("Bienvenue sur ma page !");
+            displayElement.innerHTML = `<span class="status-match">BRAVO !</span>`;
+            //console.log("Script exécuté !");
+            </script>
         </div>
-        <div id="note-name-display" style="margin-top:10px; font-size:1.5rem; font-weight:bold; color:var(--primary-accent);"></div>
+        <div id="note-name-display" style="margin-top:5px; font-size:1.5rem; font-weight:bold; color:var(--primary-accent);"></div>
     </div>
 
     <div class="panel glass-panel">
@@ -467,8 +474,9 @@ function checkNote(detectedFreq) {
     const targetData = NOTES_DATA[currentTarget];
     const targetFreq = targetData.freq;
     
-    const centsDiff = 1200 * Math.log2(detectedFreq / targetFreq);
-    
+    // const centsDiff = 1200 * Math.log2(detectedFreq / targetFreq); // Valeur d'Origine
+    const centsDiff = 600 * Math.log2(detectedFreq / targetFreq); // Modif Gillou Précision plus tolérante
+
     // Tuner UI
     const tunerIndicator = document.getElementById('tuner-indicator');
     let displayCents = Math.max(-50, Math.min(50, centsDiff));
@@ -476,8 +484,8 @@ function checkNote(detectedFreq) {
     
     const displayElement = document.getElementById('detected-note');
     
-    // Détection de succès (+/- 15 cents)
-    if (Math.abs(centsDiff) < 15) {
+    // Détection de succès (+/- 15 cents) (augmenté à +/- 20 Cents)
+    if (Math.abs(centsDiff) < 20) {
         tunerIndicator.style.backgroundColor = "var(--success-color)";
         
         // Verrouillage temporaire pour éviter les doubles déclenchements rapides
