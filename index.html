@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clarinet Pro Trainer</title>
+    <title>Clarinette</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
@@ -43,7 +43,7 @@
         .app-container {
             width: 100%;
             max-width: 1200px;
-            padding: 1px;
+            padding: 10px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -66,7 +66,7 @@
             width: 100%;
             padding: 1rem 0;
             text-align: center;
-            margin-bottom: 1px;
+            margin-bottom: 5px;
         }
 
         h1 {
@@ -84,16 +84,17 @@
             gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
+            align-items: center;
             width: 100%;
-            padding: 10px;
+            padding: 15px;
             background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            margin-bottom: 10px;
+            border-radius: 15px;
+            margin-bottom: 20px;
         }
 
         select {
-            padding: 10px 12px;
-            border-radius: 10px;
+            padding: 12px 20px;
+            border-radius: 50px;
             border: none;
             background: #fff;
             color: #333;
@@ -110,9 +111,51 @@
             padding-right: 2.5em;
         }
 
+        /* Style spécifique pour le slider de bruit */
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .slider-label {
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+            color: #a8dadc;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 120px;
+            background: transparent;
+        }
+        
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: var(--accent-gold);
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+        }
+
         button {
-            padding: 10px 12px;
-            border-radius: 10px;
+            padding: 12px 25px;
+            border-radius: 50px;
             border: none;
             font-family: var(--font-main);
             font-size: 1rem;
@@ -144,7 +187,7 @@
             flex-wrap: wrap;
             justify-content: center;
             align-items: flex-start;
-            gap: 10px;
+            gap: 20px;
             width: 100%;
         }
 
@@ -219,7 +262,7 @@
         .status-detected { 
             color: #fff; 
             font-size: 1.1rem; 
-            margin-bottom: 1px; 
+            margin-bottom: 5px; 
             font-weight: 300;
         }
         
@@ -237,7 +280,7 @@
         /* Tuner Bar Modernisée */
         #tuner-bar {
             width: 100%;
-            height: 15px;
+            height: 12px;
             background: rgba(0,0,0,0.4);
             margin-top: 10px;
             position: relative;
@@ -280,10 +323,11 @@
         @media (max-width: 768px) {
             h1 { font-size: 1.5rem; }
             #controls { flex-direction: column; align-items: stretch; gap: 10px; }
-            select, button { width: 100%; text-align: center; }
+            select, button, .slider-container { width: 100%; text-align: center; }
             #main-display { gap: 10px; }
             .panel { padding: 15px; margin: 5px; }
             .clarinet-svg { max-height: 400px; }
+            input[type=range] { width: 100%; }
         }
 
     </style>
@@ -298,16 +342,22 @@
 
     <div id="controls">
         <select id="mode-select">
-            <option value="single">Mode: 1 Note</option>
-            <option value="series">Mode: Série 5 Notes</option>
+            <option value="single">Mode: 1 Note (Focus)</option>
+            <option value="series">Mode: Série (5 Notes)</option>
         </select>
         <select id="level-select">
-            <option value="1">Niveau 1: Chalumeau (Mi3 - La4)</option>
-            <option value="2">Niveau 2: Passage (La3 - Do5)</option>
-            <option value="3">Niveau 3: Clairon (Si4 - Do6)</option>
+            <option value="1">Niveau 1: Chalumeau (Mi3 - La4 + Alter)</option>
+            <option value="2">Niveau 2: Passage (La3 - Do5 + Alter)</option>
+            <option value="3">Niveau 3: Clairon (Si4 - Do6 + Alter)</option>
             <option value="4">Niveau 4: Chromatique Complet</option>
             <option value="5">Niveau 5: Altissimo & Sauts</option>
         </select>
+
+        <div class="slider-container">
+            <label for="noise-gate" class="slider-label">Filtre Bruit</label>
+            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05" title="Ajuster la sensibilité du micro">
+        </div>
+
         <button id="start-btn">🎙️ Activer Micro</button>
         <button id="next-btn">⏩ Suivante</button>
     </div>
@@ -381,8 +431,6 @@ const FR_NOTES = {
 };
 
 function getFrenchNoteName(noteKey) {
-    // Ex: "F#4" -> notePart="F#", octavePart="4"
-    // Ex: "Bb3" -> notePart="Bb", octavePart="3"
     const match = noteKey.match(/^([A-G][#b]?)(\d)$/);
     if (match) {
         const name = FR_NOTES[match[1]] || match[1];
@@ -427,35 +475,25 @@ const NOTES_DATA = {
     "C6": { freq: 932.33, keys: ["R", "T"] }
 };
 
-// AJOUT DES BÉMOLS (Enharmonie) pour affichage correct
+// AJOUT DES BÉMOLS (Enharmonie)
 const ENHARMONICS = {
     "Gb3": "F#3", "Ab3": "G#3", "Bb3": "A#3", "Db4": "C#4", "Eb4": "D#4",
     "Gb4": "F#4", "Ab4": "G#4", "Bb4": "A#4", "Db5": "C#5", "Eb5": "D#5",
     "Gb5": "F#5", "Ab5": "G#5", "Bb5": "A#5"
 };
 
-// Fusionner les bémols dans NOTES_DATA
 for (let [flat, sharp] of Object.entries(ENHARMONICS)) {
     if (NOTES_DATA[sharp]) {
         NOTES_DATA[flat] = NOTES_DATA[sharp];
     }
 }
 
-// Mise à jour des Niveaux avec Bémols et Dièses comme demandé
+// Mise à jour des Niveaux avec Bémols et Dièses
 const LEVELS = {
-    // Niveau 1: Chalumeau étendu avec simples altérations
     1: ["E3", "F3", "F#3", "G3", "G#3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4"], 
-    
-    // Niveau 2: Chalumeau haut + Clairon bas + altérations communes
     2: ["G3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5"], 
-    
-    // Niveau 3: Clairon complet avec altérations
     3: ["C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5", "C#5", "D5", "Eb5", "E5", "F5", "F#5", "G5"], 
-    
-    // Niveau 4: Chromatique Complet (Mélange bémols et dièses aléatoire via la liste complète)
     4: ["C#4", "Db4", "D#4", "Eb4", "F#4", "Gb4", "G#4", "Ab4", "A#4", "Bb4", "C#5", "Db5", "D#5", "Eb5", "F#5", "Gb5", "G#5", "Ab5"], 
-    
-    // Niveau 5: Tout
     5: Object.keys(NOTES_DATA) 
 };
 
@@ -466,7 +504,7 @@ let noteQueue = [];
 let queueIndex = 0; 
 
 /**
- * --- MOTEUR AUDIO (INTACT) ---
+ * --- MOTEUR AUDIO (AVEC NOISE GATE) ---
  */
 let audioContext;
 let analyser;
@@ -509,7 +547,13 @@ function autoCorrelate(buf, sampleRate) {
     let rms = 0;
     for (let i = 0; i < size; i++) { let val = buf[i]; rms += val * val; }
     rms = Math.sqrt(rms / size);
-    if (rms < 0.01) return -1; 
+    
+    // MODIFICATION ICI: UTILISATION DE LA VALEUR DU SLIDER
+    // Récupère la valeur du slider (entre 0.01 et 0.2)
+    const noiseThreshold = parseFloat(document.getElementById('noise-gate').value);
+    
+    // Si le volume (rms) est inférieur au seuil, on ignore (retourne -1)
+    if (rms < noiseThreshold) return -1; 
 
     let r1 = 0, r2 = size - 1, thres = 0.2;
     for (let i = 0; i < size / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
@@ -647,14 +691,12 @@ const canvas = document.getElementById('staff-canvas');
 const ctx = canvas.getContext('2d');
 
 function drawStaff(notes, activeIndex) {
-    // Adapter le canvas au DPI
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
     
-    // Récupérer largeur/hauteur logiques
     const width = rect.width;
     const height = rect.height;
 
@@ -680,9 +722,6 @@ function drawStaff(notes, activeIndex) {
 
     let xOffset = (notes.length === 1) ? (width / 2) : 60;
 
-    // Mapping positions verticales (ajout des bémols)
-    // NB: Les bémols occupent la même position "visuelle" que la note naturelle
-    // Ex: Bb3 est sur la ligne du Si (5.5), A#3 est sur l'interligne du La (6)
     const noteStepsFromTop = {
         "C6": -2, "B5": -1.5, "Bb5": -1.5, "A#5": -1, "A5": -1, "Ab5": -1, "G#5": -0.5, "G5": -0.5, "Gb5": -0.5,
         "F#5": 0, "F5": 0, "E5": 0.5, "Eb5": 0.5, "D#5": 1, "D5": 1, "Db5": 1, "C#5": 1.5, "C5": 1.5,
@@ -695,13 +734,11 @@ function drawStaff(notes, activeIndex) {
         const steps = noteStepsFromTop[noteName];
         const noteY = staffY + (steps * lineSpacing);
         
-        // Calcul position X responsive
         let noteX = xOffset;
         if (notes.length > 1) {
             noteX = 70 + (idx * ((width - 100) / (notes.length - 1)));
         }
 
-        // Lignes supplémentaires
         ctx.strokeStyle = "#333"; 
         if (steps >= 5) { 
             for (let s = 5; s <= steps; s++) {
@@ -720,23 +757,19 @@ function drawStaff(notes, activeIndex) {
             }
         }
 
-        // COULEURS
         let noteColor = "var(--note-pending)";
         if (idx < activeIndex) noteColor = "var(--note-success)";
         else if (idx === activeIndex) noteColor = "var(--note-current)";
 
-        // Dessin Tête
         ctx.beginPath();
         ctx.ellipse(noteX, noteY, 9, 7, 0, 0, 2 * Math.PI);
         
-        // Résolution couleur canvas
         if(noteColor.includes("success")) ctx.fillStyle = "#06d6a0";
         else if(noteColor.includes("current")) ctx.fillStyle = "#ef476f";
         else ctx.fillStyle = "#000";
         
         ctx.fill();
 
-        // Altérations (Dièse ou Bémol)
         ctx.font = "22px Arial";
         if (noteName.includes("#")) {
             ctx.fillText("♯", noteX - 22, noteY + 6);
@@ -777,7 +810,6 @@ document.getElementById('mode-select').addEventListener('change', () => {
     if(isListening) startNewSequence(); 
 });
 
-// Redimensionnement de la fenêtre pour le canvas
 window.addEventListener('resize', () => {
     if(noteQueue.length > 0) drawStaff(noteQueue, queueIndex);
 });
