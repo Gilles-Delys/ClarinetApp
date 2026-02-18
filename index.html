@@ -14,7 +14,9 @@
             --glass-border: rgba(255, 255, 255, 0.25);
             
             --text-main: #ffffff;
-            --primary-btn: #00b4d8;
+            /* Modif Gillou: couleur des Clés à boucher */
+            --primary-btn: #e81616;
+            /* --primary-btn: #00b4d8;  Valeur d'origine */
             --start-btn: #06d6a0;
             --danger-color: #ef476f;
             --accent-gold: #ffd166;
@@ -119,7 +121,7 @@
             padding: 2px 6px;
             border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.2);
-            height: 32px;
+            height: 40px;   /* D'origine: 32px */
             justify-content: center;
         }
         
@@ -231,15 +233,17 @@
         }
 
         #detected-note {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            z-index: 10;
+            /* Modif Gillou d'origine: position: absolute; */
+            position: absolute;  /* Modif Gillou d'origine: position: absolute;*/
+            /* top: 4px; */
+            /* right: 4px; */
+            /* z-index: 10; */
             padding: 2px 6px;
             border-radius: 8px;
             font-size: 0.8rem;
             text-align: center;
             pointer-events: none;
+            border: 2px solid transparent; /* Modif Gillou Bordure invisible */
         }
 
         /* Clarinette Visuelle */
@@ -258,9 +262,14 @@
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); 
         }
         
+        /* Modif Gillou */
         .key { fill: #cfd8dc; stroke: #455a64; stroke-width: 1; transition: fill 0.2s; }
+        /*.key { fill: #cfd8dc; stroke: #ef1b1b; stroke-width: 1; transition: fill 0.2s; } */
         .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 6px var(--primary-btn)); }
-        .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; }
+        
+        /* Modif Gillou */
+        .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; } 
+        /* .hole { fill: #f31515; stroke: #90a4ae; stroke-width: 2; }*/
         .hole.closed { fill: var(--primary-btn); stroke: #fff; }
 
         /* Feedback Area */
@@ -295,7 +304,7 @@
         /* Tuner Bar */
         #tuner-bar {
             width: 100%;
-            height: 8px; /* Très fin */
+            height: 12px; /* Très fin : 8px*/
             background: rgba(0,0,0,0.4);
             margin-top: 2px;
             position: relative;
@@ -384,7 +393,7 @@
     <div id="controls">
         <select id="mode-select">
             <option value="single">Mode: 1 Note</option>
-            <option value="series">Mode: Série (5)</option>
+            <option value="series">Mode: Série 5 Notes</option>
         </select>
         <select id="level-select">
             <option value="1">Niv 1: Chalumeau</option>
@@ -395,7 +404,7 @@
         </select>
 
         <div class="slider-container">
-            <label for="noise-gate" class="slider-label">Bruit (Seuil)</label>
+            <label for="noise-gate" class="slider-label">Bruit de fond</label>
             <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05">
         </div>
 
@@ -411,7 +420,7 @@
         <div class="panel glass-panel">
             <h3>Partition</h3>
             <div id="staff-container">
-                <div id="detected-note" class="status-detected">--</div>
+                <div id="detected-note" class="status-detected">---</div>
                 <canvas id="staff-canvas"></canvas>
             </div>
             <div id="note-name-display"></div>
@@ -664,7 +673,9 @@ function updateUI() {
     const displayElement = document.getElementById('detected-note');
     displayElement.innerText = "Attente...";
     displayElement.className = "status-detected";
-    displayElement.style.backgroundColor = "rgba(255,255,255,0.8)"; // Reset background
+    // Modif Gillou pour "effacer les bords du Label contenant la fréquence perçue"
+    // displayElement.style.backgroundColor = "rgba(255,255,255,0.8)"; // Reset background
+    displayElement.style.backgroundColor = "rgba(255,255,255,0.1)"; // Reset background
 
     document.getElementById('tuner-indicator').style.left = "50%";
     document.getElementById('tuner-indicator').style.backgroundColor = "#fff";
