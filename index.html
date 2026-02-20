@@ -20,8 +20,9 @@
             --start-btn: #06d6a0;
             --danger-color: #ef476f;
             --accent-gold: #ffd166;
-            
-            --note-current: #ef476f;
+            /* Modif Gillou: Recherche de la couleur du nom de la note mais c'est pas ça ! */
+            /* --note-current: #ef476f; */
+            --note-current: #60ef47;
             --note-success: #06d6a0;
             --note-pending: #000000;
             
@@ -262,12 +263,12 @@
             filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); 
         }
         
-        /* Modif Gillou */
+        /* Modif Gillou Pour la Clarinette */
         .key { fill: #cfd8dc; stroke: #455a64; stroke-width: 1; transition: fill 0.2s; }
         /*.key { fill: #cfd8dc; stroke: #ef1b1b; stroke-width: 1; transition: fill 0.2s; } */
         .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 6px var(--primary-btn)); }
         
-        /* Modif Gillou */
+        /* Modif Gillou Pour la Clarinette */
         .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; } 
         /* .hole { fill: #f31515; stroke: #90a4ae; stroke-width: 2; }*/
         .hole.closed { fill: var(--primary-btn); stroke: #fff; }
@@ -338,7 +339,9 @@
             margin-top: 2px; 
             font-size: 1.2rem; 
             font-weight: 700; 
-            color: var(--primary-btn);
+            /* Modif Gillou Couleur du nom de la note en dessous en rouge TROP FLASH !!! */
+            color: var(--note-success);
+            /* color: var(--primary-btn); */
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
             min-height: 1.5em;
         }
