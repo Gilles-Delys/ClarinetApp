@@ -234,7 +234,7 @@
 
         canvas#canvasBelleClarinette { 
             width: 100%; 
-            height: 200px; /* Hauteur fixe CSS, canvas interne géré par JS */
+            height: 300px; /* Hauteur fixe CSS, canvas interne géré par JS */
             z-index: 1; 
         }
 
@@ -474,18 +474,13 @@
             </div>
         </div>
 
-        <!-- 
-            ESSAI D'UNE DIV D'UNE VRAIE CLARINETTE GILLOU  
-        -->
-
+        <!-- ESSAI D'UNE DIV D'UNE BELLE CLARINETTE GILLOU -->
         <div class="panel glass-panel">
             <h3>Doigté (Boehm)</h3>
             <div id="BelleClarinette">
                 <canvas id="canvasBelleClarinette"></canvas>
             </div>
         </div>
-
-
 
     </div>
 </div>
@@ -518,7 +513,8 @@ function getFrenchNoteName(noteKey) {
 }
 
 /**
- * --- DOIGTÉES SELON LES NOTES --- ( A AJOUTER, COMPLETER, CORRIGER, MODIFIER )
+ * --- DOIGTÉES SELON LES NOTES !!! IMPORTANT POUR LES 2 REPRÉSENTATIONS !!! --- 
+ * --- ( A AJOUTER, COMPLETER, CORRIGER, MODIFIER )
  */
 const NOTES_DATA = {
     "E3": { freq: 146.83, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
@@ -585,8 +581,6 @@ const LEVELS = {
  */
 let noteQueue = []; 
 let queueIndex = 0; 
-
-
 
 /**
  * --- MOTEUR AUDIO (AVEC NOISE GATE) ---
@@ -909,6 +903,7 @@ function drawStaff(notes, activeIndex) {
 }
 
 function showFingering(noteName) {
+    // ICI SE TROUVE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
     document.querySelectorAll('.key, .hole').forEach(el => {
         el.style.fill = ""; 
         el.style.stroke = ""; 
@@ -928,6 +923,26 @@ function showFingering(noteName) {
             }
         }
     });
+    // FIN DE ICI SE TROUVE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
+
+    // --- NOUVEAU CODE (BELLE CLARINETTE) ---
+    // On envoie la liste des clés (ex: ["T", "1", "2"]) à la fonction de dessin
+    if (data && data.keys) {
+        updateBelleClarinette(data.keys);
+    }
+
+    /** 4. INITIALISATION AU CHARGEMENT **/
+    imgClarinette.onload = () => {
+    canvasClarinette.width = imgClarinette.width;
+    canvasClarinette.height = imgClarinette.height;
+    // Au début, on dessine la clarinette sans pastille
+   updateBelleClarinette([]); 
+};
+
+
+
+
+
 }
 
 // Events
@@ -945,26 +960,63 @@ window.addEventListener('resize', () => {
 
 
 
+/** --- Insertion d'une representation d'une Belle Clarinette --- */
 
-/**
- * --- Insertion d'une representation d'une vrai clarinette ---
- */
-   // Configuration
-  const imageSrc = "VRAIE_CLARINETTE_DE_BASE.jpg"; // Remplacez par le chemin de votre image JPG
-  const pastille = {
-    x: 135,       // Position X de la pastille
-    y: 210,       // Position Y de la pastille
-    rayon: 13,   // Rayon de la pastille
-    couleur: "red" // Couleur de la pastille
+  const imageSrc = "BelleClarinette.jpg";
+
+  /** --- Objet centralisant 46 NOTES différentes MAIS 83 DOIGTÉS DIFFÉRENTS !!! 
+   *  --- CAR PLUSIEURS DOIGTÉS POSSIBLES selon CERTAINES NOTES !!!  --- */
+  const FINGERING_POSITIONS = {
+    "T":  { x: 135, y: 210 }, 
+    "L1": { x: 135, y: 318 }, // C'est le FA#3 le "L1"
+    "L2": { x: 135, y: 395 }, // Exemple à ajuster
+    // "R1": { x: ..., y: ... },
   };
-
-  // Récupération du canvas et du contexte (RENOMMÉS POUR ÉVITER LE CONFLIT)
   const canvasClarinette = document.getElementById("canvasBelleClarinette");
   const ctxClarinette = canvasClarinette.getContext("2d");
+  const imgClarinette = new Image();    // Chargement de l'image
+  imgClarinette.src = imageSrc;         // Ou imgClarinette.src = "BelleClarinette.jpg";
 
-  // Chargement de l'image
-  const img = new Image();
-  img.src = imageSrc;
+
+
+/** * FONCTION ESSENTIELLE : Elle dessine l'image ET les pastilles
+ * @param {Array} activeKeys - Liste des clés à allumer (ex: ["T", "L1"])
+ */
+function updateBelleClarinette(activeKeys = []) {
+  if (!imgClarinette.complete) return; // Sécurité si l'image n'est pas encore prête
+  // 1. On efface et on redessine l'image de fond
+  ctxClarinette.clearRect(0, 0, canvasClarinette.width, canvasClarinette.height); // A Commenter Peut-etre ???
+  ctxClarinette.drawImage(imgClarinette, 0, 0);     // On redessine l'image (déjà en mémoire, donc ultra rapide)
+
+  // 2. On dessine chaque pastille active
+  activeKeys.forEach(keyId => {
+    const pos = FINGERING_POSITIONS[keyId];
+    if (pos) {
+      ctxClarinette.beginPath();
+      ctxClarinette.arc(pos.x, pos.y, 14, 0, Math.PI * 2);
+      ctxClarinette.fillStyle = "rgba(255, 0, 0, 0.8)"; // Rouge un peu transparent
+      ctxClarinette.fill();
+      ctxClarinette.strokeStyle = "white";
+      ctxClarinette.lineWidth = 2;
+      ctxClarinette.stroke();
+    }
+  });
+}
+
+// Chargement de l'image
+imgClarinette.onload = () => {
+  canvasClarinette.width = imgClarinette.width;
+  canvasClarinette.height = imgClarinette.height;
+  
+  // Affiche la clarinette avec le FA#3 (L1) par défaut pour tester
+  updateBelleClarinette(["L1"]); 
+};
+
+imgClarinette.onerror = function() {
+  alert("Impossible de charger l'image : " + imageSrc);
+};
+
+  /*
   img.onload = function() {
     // Ajuster la taille du canvas à l'image
     canvasClarinette.width = img.width;
@@ -984,16 +1036,35 @@ window.addEventListener('resize', () => {
     ctxClarinette.strokeStyle = "#fff";
     ctxClarinette.stroke();
   };
+  */
+  // On s'assure que l'image est chargée avant de faire quoi que ce soit
+  /*
+  imgClarinette.onload = () => {
+    canvasClarinette.width = imgClarinette.width;
+    canvasClarinette.height = imgClarinette.height;
+    // On dessine l'état initial (vide)
+    updateBelleClarinette([]); 
+  };
+  */
 
   // Gestion des erreurs de chargement
   img.onerror = function() {
     alert("Impossible de charger l'image : " + imageSrc);
   };
 
-// Initialisation des deux canvas (COMMENTÉS CAR LA FONCTION EST DÉSACTIVÉE PLUS HAUT)
-// initCanvas("staff-canvas");
-// initCanvas("canvasBelleClarinette");
-
+  
+ /** 5. OUTIL DE DEVE POUR MESURE X:-Y: (F12) **/
+canvasClarinette.addEventListener('mousedown', function(e) {
+    const rect = canvasClarinette.getBoundingClientRect();
+    const x = Math.round((e.clientX - rect.left) * (canvasClarinette.width / rect.width));
+    const y = Math.round((e.clientY - rect.top) * (canvasClarinette.height / rect.height));
+    
+    // Alerte visuelle pour être sûr que vous voyez les chiffres !
+    console.log("CLIC DÉTECTÉ -> x:", x, "y:", y);
+    // Optionnel : affiche les coordonnées directement sur l'écran pour aider
+    ctxClarinette.fillStyle = "yellow";
+    ctxClarinette.fillText(`x: ${x}, y: ${y}`, x, y);
+}); 
 
 
 
