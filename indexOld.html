@@ -20,6 +20,7 @@
             --start-btn: #06d6a0;
             --danger-color: #ef476f;
             --accent-gold: #ffd166;
+            /* Modif Gillou: Recherche de la couleur du nom de la note mais c'est pas ça ! */
             /* --note-current: #ef476f; */
             --note-current: #60ef47;
             --note-success: #06d6a0;
@@ -232,12 +233,6 @@
             z-index: 1; 
         }
 
-        canvas#canvasBelleClarinette { 
-            width: 100%; 
-            height: 200px; /* Hauteur fixe CSS, canvas interne géré par JS */
-            z-index: 1; 
-        }
-
         #detected-note {
             /* Modif Gillou d'origine: position: absolute; */
             position: absolute;  /* Modif Gillou d'origine: position: absolute;*/
@@ -319,7 +314,7 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
         #tuner-indicator {
-            width: 8px;
+            width: 12px; /* Très fin : 8px*/
             height: 100%;
             background: #fff;
             position: absolute;
@@ -330,7 +325,7 @@
             box-shadow: 0 0 5px #fff;
         }
         #center-marker {
-            width: 2px;
+            width: 4px; /* Très fin : 2px*/
             height: 100%;
             background: var(--start-btn);
             position: absolute;
@@ -434,13 +429,10 @@
             <div id="note-name-display"></div>
         </div>
 
-        <!-- 
-            DIV DE LA CLARINETTE "BATON" GÉNÉRÉ PAR SVG PAS BELLE D'ORIGINE  
-        -->
         <div class="panel glass-panel">
             <h3>Doigté (Boehm)</h3>
             <div id="fingering-container">
-                <svg class="clarinet-svg" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg"> <!--viewBox="0 0 100 400"-->
+                <svg class="clarinet-svg" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg"><!--viewBox="0 0 100 400"-->
                     <rect x="40" y="10" width="20" height="380" rx="10" fill="#181818" stroke="#333"/>
                     
                     <circle id="key-R" class="key" cx="25" cy="40" r="6" />
@@ -473,25 +465,10 @@
                 </svg>
             </div>
         </div>
-
-        <!-- 
-            ESSAI D'UNE DIV D'UNE VRAIE CLARINETTE GILLOU  
-        -->
-
-        <div class="panel glass-panel">
-            <h3>Doigté (Boehm)</h3>
-            <div id="BelleClarinette">
-                <canvas id="canvasBelleClarinette"></canvas>
-            </div>
-        </div>
-
-
-
     </div>
 </div>
 
 <script>
-
 /**
  * --- TRADUCTION ET DONNÉES ---
  */
@@ -505,9 +482,6 @@ const FR_NOTES = {
     "B": "Si"
 };
 
-/**
- * --- TRANSLATION EN NOTES FRANCAISE ---
- */
 function getFrenchNoteName(noteKey) {
     const match = noteKey.match(/^([A-G][#b]?)(\d)$/);
     if (match) {
@@ -517,9 +491,6 @@ function getFrenchNoteName(noteKey) {
     return noteKey;
 }
 
-/**
- * --- DOIGTÉES SELON LES NOTES --- ( A AJOUTER, COMPLETER, CORRIGER, MODIFIER )
- */
 const NOTES_DATA = {
     "E3": { freq: 146.83, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
     "F3": { freq: 155.56, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F"] },
@@ -569,9 +540,7 @@ for (let [flat, sharp] of Object.entries(ENHARMONICS)) {
     }
 }
 
-/**
- * --- CHOIX DES NOTES SELON LE NIVEAU DE DIFFFICULTÉE ---
- */
+// Mise à jour des Niveaux
 const LEVELS = {
     1: ["E3", "F3", "F#3", "G3", "G#3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4"], 
     2: ["G3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5"], 
@@ -586,8 +555,6 @@ const LEVELS = {
 let noteQueue = []; 
 let queueIndex = 0; 
 
-
-
 /**
  * --- MOTEUR AUDIO (AVEC NOISE GATE) ---
  */
@@ -596,9 +563,6 @@ let analyser;
 let microphone;
 let isListening = false;
 
-/**
- * --- FONCTON ASYNCHRONE D'ANALYSE DE LA FRÉQUENCE PORTEUSE ---
- */
 async function initAudio() {
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -625,9 +589,6 @@ async function initAudio() {
     }
 }
 
-/**
- * --- GESTION DU BOUTON SUIVANT ---
- */
 function updateControlsVisibility() {
     const mode = document.getElementById('mode-select').value;
     // Grid gère l'affichage, on joue juste sur le display none/block
@@ -639,9 +600,6 @@ function updateControlsVisibility() {
     }
 }
 
-/**
- * --- GESTION DU CURSEUR ANTI-BRUIT ---
- */
 function autoCorrelate(buf, sampleRate) {
     let size = buf.length;
     let rms = 0;
@@ -687,14 +645,12 @@ function updatePitch() {
 /**
  * --- LOGIQUE DE JEU ---
  */
+
 function getRandomNote(level) {
     const notesPool = LEVELS[level];
     return notesPool[Math.floor(Math.random() * notesPool.length)];
 }
 
-/**
- * --- LOGIQUE DU MODE DE JEU NOTE/ NOTE OU SÉRIE DE 5 NOTES ---
- */
 function startNewSequence() {
     const mode = document.getElementById('mode-select').value;
     const level = parseInt(document.getElementById('level-select').value);
@@ -715,16 +671,14 @@ function startNewSequence() {
     updateUI();
 }
 
-/**
- * --- AFFICHAGE AU DESSUS DE LA PORTÉE SI LA NOTE EST JUSTE DANS UN ENCADRÉ ---
- */
 function updateUI() {
     // Réinitialisation affichage
     const displayElement = document.getElementById('detected-note');
     displayElement.innerText = "Attente...";
     displayElement.className = "status-detected";
     // Modif Gillou pour "effacer les bords du Label contenant la fréquence perçue"
-    displayElement.style.backgroundColor = "rgba(255,255,255,0.1)"; // Reset background "rgba(255,255,255,0.8)"
+    // displayElement.style.backgroundColor = "rgba(255,255,255,0.8)"; // Reset background
+    displayElement.style.backgroundColor = "rgba(255,255,255,0.1)"; // Reset background
 
     document.getElementById('tuner-indicator').style.left = "50%";
     document.getElementById('tuner-indicator').style.backgroundColor = "#fff";
@@ -741,9 +695,6 @@ function updateUI() {
     }
 }
 
-/**
- * --- ANALYSE DE LA FRÉQUENCE DE LA NOTE ---
- */
 function checkNote(detectedFreq) {
     if (queueIndex >= noteQueue.length) return;
 
@@ -798,7 +749,7 @@ function checkNote(detectedFreq) {
 }
 
 /**
- * --- DESSIN CANVAS (AVEC BÉMOLS ET CENTRAGE DYNAMIQUE) --- PORTÉE ClÉ de SOL ---
+ * --- DESSIN CANVAS (AVEC BÉMOLS ET CENTRAGE DYNAMIQUE) ---
  */
 const canvas = document.getElementById('staff-canvas');
 const ctx = canvas.getContext('2d');
@@ -942,60 +893,6 @@ document.getElementById('mode-select').addEventListener('change', () => {
 window.addEventListener('resize', () => {
     if(noteQueue.length > 0) drawStaff(noteQueue, queueIndex);
 });
-
-
-
-
-/**
- * --- Insertion d'une representation d'une vrai clarinette ---
- */
-   // Configuration
-  const imageSrc = "VRAIE_CLARINETTE_DE_BASE.jpg"; // Remplacez par le chemin de votre image JPG
-  const pastille = {
-    x: 135,       // Position X de la pastille
-    y: 210,       // Position Y de la pastille
-    rayon: 13,   // Rayon de la pastille
-    couleur: "red" // Couleur de la pastille
-  };
-
-  // Récupération du canvas et du contexte (RENOMMÉS POUR ÉVITER LE CONFLIT)
-  const canvasClarinette = document.getElementById("canvasBelleClarinette");
-  const ctxClarinette = canvasClarinette.getContext("2d");
-
-  // Chargement de l'image
-  const img = new Image();
-  img.src = imageSrc;
-  img.onload = function() {
-    // Ajuster la taille du canvas à l'image
-    canvasClarinette.width = img.width;
-    canvasClarinette.height = img.height;
-
-    // Dessiner l'image
-    ctxClarinette.drawImage(img, 0, 0);
-
-    // Dessiner la pastille
-    ctxClarinette.beginPath();
-    ctxClarinette.arc(pastille.x, pastille.y, pastille.rayon, 0, Math.PI * 2);
-    ctxClarinette.fillStyle = pastille.couleur;
-    ctxClarinette.fill();
-
-    // Optionnel : bordure autour de la pastille
-    ctxClarinette.lineWidth = 2;
-    ctxClarinette.strokeStyle = "#fff";
-    ctxClarinette.stroke();
-  };
-
-  // Gestion des erreurs de chargement
-  img.onerror = function() {
-    alert("Impossible de charger l'image : " + imageSrc);
-  };
-
-// Initialisation des deux canvas (COMMENTÉS CAR LA FONCTION EST DÉSACTIVÉE PLUS HAUT)
-// initCanvas("staff-canvas");
-// initCanvas("canvasBelleClarinette");
-
-
-
 
 </script>
 </body>
