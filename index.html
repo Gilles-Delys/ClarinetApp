@@ -14,13 +14,10 @@
             --glass-border: rgba(255, 255, 255, 0.25);
             
             --text-main: #ffffff;
-            /* Modif Gillou: couleur des Clés à boucher */
             --primary-btn: #e81616;
-            /* --primary-btn: #00b4d8;  Valeur d'origine */
             --start-btn: #06d6a0;
             --danger-color: #ef476f;
             --accent-gold: #ffd166;
-            /* --note-current: #ef476f; */
             --note-current: #60ef47;
             --note-success: #06d6a0;
             --note-pending: #000000;
@@ -37,18 +34,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; /* S'assure de prendre au moins tout l'écran */
             overflow-x: hidden;
         }
 
         .app-container {
             width: 100%;
             max-width: 1200px;
-            padding: 4px; /* Très réduit pour mobile */
+            padding: 4px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             align-items: center;
+            flex-grow: 1; /* Permet à l'application de s'étirer en hauteur */
         }
 
         .glass-panel {
@@ -56,7 +54,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 15px; /* Rayon réduit */
+            border-radius: 15px;
             box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.3);
             margin: 4px;
             transition: transform 0.3s ease;
@@ -71,14 +69,14 @@
 
         h1 {
             margin: 0;
-            font-size: 1.4rem; /* Plus petit */
+            font-size: 1.4rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        /* Controls Section - Optimisé Compact */
+        /* Controls Section */
         #controls {
             display: flex;
             gap: 5px;
@@ -110,7 +108,7 @@
             background-position: right .5em top 50%;
             background-size: .55em auto;
             padding-right: 1.5em;
-            height: 32px; /* Force height compact */
+            height: 32px;
         }
 
         .slider-container {
@@ -121,7 +119,7 @@
             padding: 2px 6px;
             border-radius: 6px;
             border: 1px solid rgba(255,255,255,0.2);
-            height: 40px;   /* D'origine: 32px */
+            height: 40px;
             justify-content: center;
         }
         
@@ -179,105 +177,6 @@
         button#start-btn { background: var(--start-btn); color: #1d3557; }
         button#next-btn { background: var(--accent-gold); color: #1d3557; display: none; }
 
-        /* Layout Principal */
-        #main-display {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
-            gap: 6px;
-            width: 100%;
-        }
-
-        .panel {
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1 1 300px;
-            min-width: 0;
-            width: 100%;
-            max-width: 600px;
-            box-sizing: border-box;
-        }
-        
-        h3 { 
-            margin: 2px 0 6px 0; 
-            color: #a8dadc; 
-            font-weight: 400; 
-            border-bottom: 1px solid rgba(255,255,255,0.2); 
-            padding-bottom: 2px; 
-            width: 100%; 
-            text-align: center; 
-            font-size: 0.9rem;
-        }
-
-        /* Canvas Portée Container */
-        #staff-container { 
-            width: 100%; 
-            height: auto; 
-            position: relative; 
-            display: flex; 
-            justify-content: center; 
-            background: rgba(255,255,255,0.9);
-            border-radius: 8px;
-            padding: 5px 0;
-            overflow: hidden; 
-        }
-        
-        canvas#staff-canvas { 
-            width: 100%; 
-            height: 200px; /* Hauteur fixe CSS, canvas interne géré par JS */
-            z-index: 1; 
-        }
-
-        canvas#canvasBelleClarinette { 
-            width: 100%; 
-            height: 300px; /* Hauteur fixe CSS, canvas interne géré par JS */
-            z-index: 1; 
-        }
-
-        #detected-note {
-            /* Modif Gillou d'origine: position: absolute; */
-            position: absolute;  /* Modif Gillou d'origine: position: absolute;*/
-            /* top: 4px; */
-            /* right: 4px; */
-            /* z-index: 10; */
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            text-align: center;
-            pointer-events: none;
-            border: 2px solid transparent; /* Modif Gillou Bordure invisible */
-        }
-
-        /* Clarinette Visuelle */
-        #fingering-container { 
-            width: 100%; 
-            max-width: 100px; /* Plus étroit pour mobile GILLOU 180px D'origine essai plus étroit */
-            height: auto;
-            position: relative; 
-            display: flex;
-            justify-content: center; 
-        }
-        .clarinet-svg { 
-            width: 100%; 
-            height: auto; 
-            max-height: 300px; /* Limite hauteur */
-            filter: drop-shadow(0 5px 10px rgba(0,0,0,0.5)); 
-        }
-        
-        /* Modif Gillou Pour la Clarinette */
-        .key { fill: #cfd8dc; stroke: #455a64; stroke-width: 1; transition: fill 0.2s; }
-        /*.key { fill: #cfd8dc; stroke: #ef1b1b; stroke-width: 1; transition: fill 0.2s; } */
-        .key.active { fill: var(--primary-btn); stroke: #fff; filter: drop-shadow(0 0 6px var(--primary-btn)); }
-        
-        /* Modif Gillou Pour la Clarinette */
-        .hole { fill: #263238; stroke: #90a4ae; stroke-width: 2; } 
-        /* .hole { fill: #f31515; stroke: #90a4ae; stroke-width: 2; }*/
-        .hole.closed { fill: var(--primary-btn); stroke: #fff; }
-
         /* Feedback Area */
         #feedback-area {
             margin: 4px 0 8px 0;
@@ -286,31 +185,10 @@
             max-width: 600px;
         }
 
-        .status-detected { 
-            color: #333; 
-            font-weight: 600;
-            background: rgba(255,255,255,0.8);
-            border: 1px solid #ccc;
-        }
-        
-        .status-match { 
-            color: #fff; 
-            background-color: var(--start-btn); 
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-weight: 700; 
-            font-size: 0.9rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: inline-block;
-        }
-        
-        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
         /* Tuner Bar */
         #tuner-bar {
             width: 100%;
-            height: 12px; /* Très fin : 8px*/
+            height: 12px;
             background: rgba(0,0,0,0.4);
             margin-top: 2px;
             position: relative;
@@ -339,54 +217,183 @@
             z-index: 1;
             opacity: 0.8;
         }
+
+        /* Layout Principal */
+        #main-display {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch; /* Permet aux panels de s'étirer jusqu'en bas */
+            gap: 6px;
+            width: 100%;
+            flex-grow: 1; /* Pousse l'élément jusqu'en bas de la page disponible */
+        }
+
+        .panel {
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        /* Ajustement des proportions pour la version PC */
+        .panel:nth-child(1) {
+            flex: 2 1 400px; /* Prend plus de place horizontale */
+            max-width: 800px;
+        }
+        .panel:nth-child(2) {
+            flex: 1 1 250px; /* Plus étroit */
+            max-width: 350px;
+        }
         
+        h3 { 
+            margin: 2px 0 6px 0; 
+            color: #a8dadc; 
+            font-weight: 400; 
+            border-bottom: 1px solid rgba(255,255,255,0.2); 
+            padding-bottom: 2px; 
+            width: 100%; 
+            text-align: center; 
+            font-size: 0.9rem;
+        }
+
+        /* Canvas Portée Container */
+        #staff-container { 
+            width: 100%; 
+            height: auto; 
+            position: relative; 
+            display: flex; 
+            justify-content: center; 
+            background: rgba(255,255,255,0.9);
+            border-radius: 8px;
+            padding: 5px 0;
+            overflow: hidden; 
+        }
+        
+        canvas#staff-canvas { 
+            width: 100%; 
+            height: 200px; 
+            z-index: 1; 
+        }
+
+        #detected-note {
+            position: absolute; 
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            text-align: center;
+            pointer-events: none;
+            border: 2px solid transparent; 
+        }
+
+        /* Conteneur et Image Belle Clarinette */
+        #BelleClarinette {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1; /* Permet de centrer l'image dans le grand panneau vertical */
+        }
+
+        canvas#canvasBelleClarinette { 
+            width: 100%; /* Prendra la largeur dispo sans dépasser */
+            max-width: 100%;
+            height: auto; /* Maintient les proportions strictes de l'image (non écrasée) */
+            object-fit: contain;
+            z-index: 1; 
+        }
+
         #note-name-display {
             margin-top: 2px; 
             font-size: 1.2rem; 
             font-weight: 700; 
-            /* Modif Gillou Couleur du nom de la note en dessous en rouge TROP FLASH !!! */
             color: var(--note-success);
-            /* color: var(--primary-btn); */
             text-shadow: 0 2px 10px rgba(0,0,0,0.2);
             min-height: 1.5em;
         }
 
+        .status-detected { 
+            color: #333; 
+            font-weight: 600;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid #ccc;
+        }
+        
+        .status-match { 
+            color: #fff; 
+            background-color: var(--start-btn); 
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 700; 
+            font-size: 0.9rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+        
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
         /* Media Queries SPÉCIFIQUE MOBILE */
         @media (max-width: 600px) {
-            h1 { font-size: 1.2rem; }
-            #instruction { font-size: 0.75rem !important; }
+            .app-container { padding: 2px; }
+            header { padding: 0; margin-bottom: 2px; }
+            h1 { font-size: 1.1rem; }
+            #instruction { font-size: 0.75rem !important; margin-top: 0; }
 
-            /* Grille compacte */
+            /* Grille compacte optimisée hauteur */
             #controls { 
                 display: grid;
-                grid-template-columns: 1fr 1fr 1fr; /* 3 colonnes pour gagner de la place */
-                gap: 4px;
-                padding: 4px;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 2px;
+                padding: 2px;
+                margin-bottom: 2px;
             }
             
-            select { grid-column: span 1; font-size: 0.75rem; padding: 2px 4px; height: 30px; }
-            #mode-select { grid-column: 1 / span 2; } /* Prend 2 places */
+            select { grid-column: span 1; font-size: 0.75rem; padding: 0 4px; height: 28px; }
+            #mode-select { grid-column: 1 / span 2; } 
             #level-select { grid-column: 3 / span 1; } 
             
             .slider-container { 
                 grid-column: 1 / span 2; 
-                height: 30px; 
+                height: 28px; 
             }
             
             #start-btn, #next-btn { 
                 grid-column: 3 / span 1; 
                 width: 100%; 
                 font-size: 0.75rem; 
-                height: 30px;
+                height: 28px;
             }
 
-            #main-display { flex-direction: column; align-items: center; }
-            .panel { width: 100%; margin: 0 0 6px 0; padding: 6px; }
+            #feedback-area { margin: 2px 0 4px 0; }
+            #tuner-bar { height: 14px; /* Reste épaisse pour la visibilité */ }
+
+            #main-display { flex-direction: column; align-items: stretch; gap: 4px; }
             
-            .clarinet-svg { max-height: 280px; }
+            .panel:nth-child(1), .panel:nth-child(2) { 
+                width: 100%; 
+                margin: 0; 
+                padding: 4px; 
+                max-width: 100%;
+                flex: auto; /* Désactive la répartition PC */
+            }
             
-            /* Canvas ajusté */
-            canvas#staff-canvas { height: 160px; } /* Moins haut sur mobile */
+            h3 { font-size: 0.8rem; margin: 0 0 2px 0; padding-bottom: 1px; }
+            
+            #staff-container { padding: 0; }
+            canvas#staff-canvas { height: 120px; } /* Ajusté pour laisser de la place */
+            #note-name-display { font-size: 1rem; min-height: 1.2em; margin-top: 0; }
+
+            /* Image mobile restreinte par la hauteur de l'écran pour éviter le scroll excessif */
+            canvas#canvasBelleClarinette { 
+                max-height: 40vh; /* La clarinette ne dépassera pas 40% de la hauteur de l'écran */
+                width: auto;
+                margin: 0 auto;
+                display: block;
+            }
         }
     </style>
 </head>
@@ -424,7 +431,6 @@
         <div id="tuner-bar"><div id="center-marker"></div><div id="tuner-indicator"></div></div>
     </div>
 
-    <!-- DIV DE LA BELLE PARTITION -->
     <div id="main-display">
         <div class="panel glass-panel">
             <h3>Partition</h3>
@@ -435,7 +441,6 @@
             <div id="note-name-display"></div>
         </div>
 
-        <!-- DIV DE LA BELLE CLARINETTE -->
         <div class="panel glass-panel">
             <h3>Doigté (Boehm)</h3>
             <div id="BelleClarinette">
@@ -864,30 +869,9 @@ function drawStaff(notes, activeIndex) {
 }
 
 function showFingering(noteName) {
-    // ICI SE TROUVE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
-    // document.querySelectorAll('.key, .hole').forEach(el => {
-    //    el.style.fill = ""; 
-    //    el.style.stroke = ""; 
-    //    el.classList.remove('active', 'closed'); 
-    // });
-
     const data = NOTES_DATA[noteName];
     if (!data) return;
 
-    // data.keys.forEach(keyId => {
-    //    const el = document.getElementById(`key-${keyId}`);
-    //    if (el) {
-    //        if (el.classList.contains('hole')) {
-    //            el.classList.add('closed'); 
-    //        } else {
-    //            el.classList.add('active'); 
-    //        }
-    //    }
-    //});
-    // FIN DE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
-
-    // --- NOUVEAU CODE (BELLE CLARINETTE) ---
-    // On envoie la liste des clés (ex: ["T", "1", "2"]) à la fonction de dessin
     if (data && data.keys) {
         updateBelleClarinette(data.keys);
     }
@@ -914,8 +898,7 @@ window.addEventListener('resize', () => {
     if(noteQueue.length > 0) drawStaff(noteQueue, queueIndex);
 });
 
-/** 
- * --- Insertion d'une representation d'une Belle Clarinette --- 
+/** * --- Insertion d'une representation d'une Belle Clarinette --- 
  * --- Objet centralisant 46 NOTES MAIS 83 DOIGTÉS CAR PLUSIEURS DOIGTÉS POSSIBLES selon CERTAINES NOTES !!!
 **/
 const FINGERING_POSITIONS = {
@@ -956,23 +939,19 @@ const FINGERING_POSITIONS = {
  * @param {Array} activeKeys - Liste des clés à allumer (ex: ["T", "L1"])
  */
 function updateBelleClarinette(activeKeys = []) {
-  if (!imgClarinette.complete) return; // Sécurité si l'image n'est pas encore prête
-  // 1. On efface et on redessine l'image de fond
-  // ctxClarinette.clearRect(0, 0, canvasClarinette.width, canvasClarinette.height); // A Commenter Peut-etre ???
-  ctxClarinette.drawImage(imgClarinette, 0, 0);     // On redessine l'image (déjà en mémoire, donc ultra rapide)
+  if (!imgClarinette.complete) return; 
+  ctxClarinette.drawImage(imgClarinette, 0, 0);     
 
-  // 2. On dessine chaque pastille active
   activeKeys.forEach(keyId => {
     const pos = FINGERING_POSITIONS[keyId];
     if (pos) {
       ctxClarinette.beginPath();
       ctxClarinette.arc(pos.x, pos.y, 16, 0, Math.PI * 2);
-      ctxClarinette.fillStyle = "rgba(255, 0, 0, 0.8)"; // Rouge un peu transparent
+      ctxClarinette.fillStyle = "rgba(255, 0, 0, 0.8)"; 
       ctxClarinette.fill();
       ctxClarinette.strokeStyle = "white";
       ctxClarinette.lineWidth = 0.5;
       ctxClarinette.stroke();
-      //<rect id="key-L4-Fsharp" class="key" x="20" y="135" width="15" height="8" rx="2"/>
     }
   });
 }
@@ -981,17 +960,12 @@ function updateBelleClarinette(activeKeys = []) {
 imgClarinette.onload = () => {
   canvasClarinette.width = imgClarinette.width;
   canvasClarinette.height = imgClarinette.height;
-  ctxClarinette.drawImage(imgClarinette, 0, 0);     // on dessine l'image dès qu'elle est prête
+  ctxClarinette.drawImage(imgClarinette, 0, 0);     
 };
 
 imgClarinette.onerror = function() {
   alert("Impossible de charger l'image : " + imageSrc);
 };
-
-// Gestion des erreurs de chargement
-// img.onerror = function() {
-//  alert("Impossible de charger l'image : " + imageSrc);
-//};
 
 </script>
 </body>
