@@ -227,7 +227,7 @@
             align-items: stretch; /* Permet aux panels de s'étirer jusqu'en bas */
             gap: 6px;
             width: 100%;
-            flex-grow: 1; /* Pousse l'élément jusqu'en bas de la page disponible */
+            flex-grow: 1; 
         }
 
         .panel {
@@ -295,14 +295,18 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-grow: 1; /* Permet de centrer l'image dans le grand panneau vertical */
+            flex-grow: 1; 
         }
 
         canvas#canvasBelleClarinette { 
-            width: 100%; /* Prendra la largeur dispo sans dépasser */
+            /* MODIFICATION PC : Restriction stricte de la hauteur pour empêcher le scroll */
             max-width: 100%;
-            height: auto; /* Maintient les proportions strictes de l'image (non écrasée) */
+            max-height: 60vh; /* Bloqué à 55% de la hauteur de l'écran maximum */
+            width: auto;      /* S'adapte proportionnellement à la hauteur */
+            height: auto; 
             object-fit: contain;
+            display: block;
+            margin: 0 auto;
             z-index: 1; 
         }
 
@@ -369,7 +373,7 @@
             }
 
             #feedback-area { margin: 2px 0 4px 0; }
-            #tuner-bar { height: 14px; /* Reste épaisse pour la visibilité */ }
+            #tuner-bar { height: 14px; }
 
             #main-display { flex-direction: column; align-items: stretch; gap: 4px; }
             
@@ -378,13 +382,13 @@
                 margin: 0; 
                 padding: 4px; 
                 max-width: 100%;
-                flex: auto; /* Désactive la répartition PC */
+                flex: auto; 
             }
             
             h3 { font-size: 0.8rem; margin: 0 0 2px 0; padding-bottom: 1px; }
             
             #staff-container { padding: 0; }
-            canvas#staff-canvas { height: 120px; } /* Ajusté pour laisser de la place */
+            canvas#staff-canvas { height: 140px; } /* Augmenté pour ne plus tronquer le Mi 3 ou les suraiguës */
             #note-name-display { font-size: 1rem; min-height: 1.2em; margin-top: 0; }
 
             /* Image mobile restreinte par la hauteur de l'écran pour éviter le scroll excessif */
