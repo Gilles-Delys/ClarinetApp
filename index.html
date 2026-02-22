@@ -255,7 +255,7 @@
         /* Clarinette Visuelle */
         #fingering-container { 
             width: 100%; 
-            max-width: 180px; /* Plus étroit pour mobile */
+            max-width: 100px; /* Plus étroit pour mobile GILLOU 180px D'origine essai plus étroit */
             height: auto;
             position: relative; 
             display: flex;
@@ -413,7 +413,7 @@
 
         <div class="slider-container">
             <label for="noise-gate" class="slider-label">Bruit de fond</label>
-            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.05">
+            <input type="range" id="noise-gate" min="0.01" max="0.2" step="0.01" value="0.07">
         </div>
 
         <button id="start-btn">🎙️ Micro</button>
@@ -424,6 +424,7 @@
         <div id="tuner-bar"><div id="center-marker"></div><div id="tuner-indicator"></div></div>
     </div>
 
+    <!-- DIV DE LA BELLE PARTITION -->
     <div id="main-display">
         <div class="panel glass-panel">
             <h3>Partition</h3>
@@ -434,47 +435,7 @@
             <div id="note-name-display"></div>
         </div>
 
-        <!-- 
-            DIV DE LA CLARINETTE "BATON" GÉNÉRÉ PAR SVG PAS BELLE D'ORIGINE  
-        -->
-        <div class="panel glass-panel">
-            <h3>Doigté (Boehm)</h3>
-            <div id="fingering-container">
-                <svg class="clarinet-svg" viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg"> <!--viewBox="0 0 100 400"-->
-                    <rect x="40" y="10" width="20" height="380" rx="10" fill="#181818" stroke="#333"/>
-                    
-                    <circle id="key-R" class="key" cx="25" cy="40" r="6" />
-                    <text x="5" y="45" fill="#888" font-size="8">12(R)</text>
-
-                    <circle id="key-T" class="hole" cx="50" cy="55" r="5" />
-                    <text x="75" y="60" fill="#888" font-size="8">T</text>
-
-                    <rect id="key-A" class="key" x="35" y="20" width="10" height="5" /> 
-                    <rect id="key-Ab" class="key" x="35" y="28" width="10" height="5" /> 
-                    
-                    <circle id="key-L1" class="hole" cx="50" cy="80" r="5" />
-                    <circle id="key-L2" class="hole" cx="50" cy="100" r="5" />
-                    <circle id="key-L3" class="hole" cx="50" cy="120" r="5" />
-                    
-                    <rect id="key-L4-E" class="key" x="65" y="130" width="15" height="8" rx="2"/> 
-                    <rect id="key-L4-F" class="key" x="65" y="140" width="15" height="8" rx="2"/> 
-                    <rect id="key-L4-Fsharp" class="key" x="20" y="135" width="15" height="8" rx="2"/> 
-                    
-                    <rect id="key-Side1" class="key" x="65" y="90" width="8" height="20" rx="2"/> 
-
-                    <circle id="key-R1" class="hole" cx="50" cy="180" r="5" />
-                    <circle id="key-R2" class="hole" cx="50" cy="200" r="5" />
-                    <circle id="key-R3" class="hole" cx="50" cy="220" r="5" />
-
-                    <rect id="key-R4-E" class="key" x="20" y="230" width="15" height="8" rx="2"/>
-                    <rect id="key-R4-F" class="key" x="20" y="240" width="15" height="8" rx="2"/>
-                    <rect id="key-R4-Fsharp" class="key" x="65" y="235" width="15" height="8" rx="2"/>
-                    <rect id="key-R4-Gsharp" class="key" x="65" y="215" width="15" height="8" rx="2"/> 
-                </svg>
-            </div>
-        </div>
-
-        <!-- ESSAI D'UNE DIV D'UNE BELLE CLARINETTE GILLOU -->
+        <!-- DIV DE LA BELLE CLARINETTE -->
         <div class="panel glass-panel">
             <h3>Doigté (Boehm)</h3>
             <div id="BelleClarinette">
@@ -517,18 +478,18 @@ function getFrenchNoteName(noteKey) {
  * --- ( A AJOUTER, COMPLETER, CORRIGER, MODIFIER )
  */
 const NOTES_DATA = {
-    "E3": { freq: 146.83, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
-    "F3": { freq: 155.56, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F"] },
-    "F#3": { freq: 164.81, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Fsharp"] },
+    "E3": { freq: 146.83, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E", "R4-F"] },
+    "F3": { freq: 155.56, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F"] },
+    "F#3": { freq: 164.81, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F#"] },
     "G3": { freq: 174.61, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3"] },
-    "G#3": { freq: 185.00, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Gsharp"] },
+    "G#3": { freq: 185.00, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-G#"] },
     "A3": { freq: 196.00, keys: ["T", "L1", "L2", "L3", "R1", "R2"] },
     "A#3": { freq: 207.65, keys: ["T", "L1", "L2", "L3", "R1"] }, 
     "B3": { freq: 220.00, keys: ["T", "L1", "L2", "L3", "R2"] }, 
     "C4": { freq: 233.08, keys: ["T", "L1", "L2", "L3"] },
-    "C#4": { freq: 246.94, keys: ["T", "L1", "L2", "L3", "L4-Fsharp"] },
+    "C#4": { freq: 246.94, keys: ["T", "L1", "L2", "L3", "L4-C#"] },
     "D4": { freq: 261.63, keys: ["T", "L1", "L2"] },
-    "D#4": { freq: 277.18, keys: ["T", "L1", "L2", "Side1"] },
+    "D#4": { freq: 277.18, keys: ["T", "L1", "L2", "TR4"] },
     "E4": { freq: 293.66, keys: ["T", "L1"] },
     "F4": { freq: 311.13, keys: ["T"] },
     "F#4": { freq: 329.63, keys: ["L1"] },
@@ -537,17 +498,17 @@ const NOTES_DATA = {
     "A4": { freq: 392.00, keys: ["A"] },
     "A#4": { freq: 415.30, keys: ["A", "R"] }, 
     "B4": { freq: 440.00, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
-    "C5": { freq: 466.16, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F"] },
-    "C#5": { freq: 493.88, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Fsharp"] },
+    "C5": { freq: 466.16, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F"] },
+    "C#5": { freq: 493.88, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F#"] },
     "D5": { freq: 523.25, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3"] },
-    "D#5": { freq: 554.37, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-Gsharp"] },
+    "D#5": { freq: 554.37, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-G#"] },
     "E5": { freq: 587.33, keys: ["R", "T", "L1", "L2", "L3", "R1", "R2"] },
     "F5": { freq: 622.25, keys: ["R", "T", "L1", "L2", "L3", "R1"] },
     "F#5": { freq: 659.25, keys: ["R", "T", "L1", "L2", "L3", "R2"] },
     "G5": { freq: 698.46, keys: ["R", "T", "L1", "L2", "L3"] },
-    "G#5": { freq: 739.99, keys: ["R", "T", "L1", "L2", "L3", "R4-Gsharp"] },
+    "G#5": { freq: 739.99, keys: ["R", "T", "L1", "L2", "L3", "R4-G#"] },
     "A5": { freq: 783.99, keys: ["R", "T", "L1", "L2"] },
-    "A#5": { freq: 830.61, keys: ["R", "T", "L1", "L2", "Side1"] },
+    "A#5": { freq: 830.61, keys: ["R", "T", "L1", "L2", "TR4"] },
     "B5": { freq: 880.00, keys: ["R", "T", "L1"] },
     "C6": { freq: 932.33, keys: ["R", "T"] }
 };
@@ -904,26 +865,26 @@ function drawStaff(notes, activeIndex) {
 
 function showFingering(noteName) {
     // ICI SE TROUVE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
-    document.querySelectorAll('.key, .hole').forEach(el => {
-        el.style.fill = ""; 
-        el.style.stroke = ""; 
-        el.classList.remove('active', 'closed'); 
-    });
+    // document.querySelectorAll('.key, .hole').forEach(el => {
+    //    el.style.fill = ""; 
+    //    el.style.stroke = ""; 
+    //    el.classList.remove('active', 'closed'); 
+    // });
 
     const data = NOTES_DATA[noteName];
     if (!data) return;
 
-    data.keys.forEach(keyId => {
-        const el = document.getElementById(`key-${keyId}`);
-        if (el) {
-            if (el.classList.contains('hole')) {
-                el.classList.add('closed'); 
-            } else {
-                el.classList.add('active'); 
-            }
-        }
-    });
-    // FIN DE ICI SE TROUVE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
+    // data.keys.forEach(keyId => {
+    //    const el = document.getElementById(`key-${keyId}`);
+    //    if (el) {
+    //        if (el.classList.contains('hole')) {
+    //            el.classList.add('closed'); 
+    //        } else {
+    //            el.classList.add('active'); 
+    //        }
+    //    }
+    //});
+    // FIN DE L'ANIMATION DE L'ANCIENNE CLARINETTE (TUBE NOIRE)
 
     // --- NOUVEAU CODE (BELLE CLARINETTE) ---
     // On envoie la liste des clés (ex: ["T", "1", "2"]) à la fonction de dessin
@@ -933,16 +894,11 @@ function showFingering(noteName) {
 
     /** 4. INITIALISATION AU CHARGEMENT **/
     imgClarinette.onload = () => {
-    canvasClarinette.width = imgClarinette.width;
-    canvasClarinette.height = imgClarinette.height;
+        canvasClarinette.width = imgClarinette.width;
+        canvasClarinette.height = imgClarinette.height;
     // Au début, on dessine la clarinette sans pastille
-   updateBelleClarinette([]); 
+   updateBelleClarinette([]);
 };
-
-
-
-
-
 }
 
 // Events
@@ -958,25 +914,42 @@ window.addEventListener('resize', () => {
     if(noteQueue.length > 0) drawStaff(noteQueue, queueIndex);
 });
 
-
-
-/** --- Insertion d'une representation d'une Belle Clarinette --- */
-
+/** 
+ * --- Insertion d'une representation d'une Belle Clarinette --- 
+ * --- Objet centralisant 46 NOTES MAIS 83 DOIGTÉS CAR PLUSIEURS DOIGTÉS POSSIBLES selon CERTAINES NOTES !!!
+**/
+const FINGERING_POSITIONS = {
+  "T":        { x: 32, y: 234 }, // Pouce arrière
+  "R":        { x: 33, y: 186 }, // Registre (12ème)
+  "A":        { x: 135, y: 160 }, // Clé de LA (gorge) "LA"
+  "Ab":       { x: 185, y: 185 }, // Clé de LAB (gorge) "SOL#"
+  "L1":       { x: 134, y: 208 }, // Index G
+  "L2":       { x: 134, y: 300 }, // Majeur G
+  "L3":       { x: 140, y: 368 }, // Annulaire G
+  "L4-E":     { x: 182, y: 452 }, // Auriculaire G - Mi
+  "L4-F":     { x: 206, y: 458 }, // Auriculaire G - Fa
+  "L4-F#":    { x: 210, y: 460 }, // Auriculaire G - Fa#
+  "L4-C#":    { x: 180, y: 395 }, // Auriculaire G - Do#
+  "TR1":      { x: 52, y: 395 }, // Trille 1 (Haut)
+  "TR2":      { x: 52, y: 418 }, // Trille 2
+  "TR3":      { x: 68, y: 440 }, // Trille 3
+  "TR4":      { x: 66, y: 464 }, // Trille 4 (Bas)
+  "R1":       { x: 135, y: 525 }, // Index D
+  "R2":       { x: 135, y: 600 }, // Majeur D
+  "R3":       { x: 135, y: 665 }, // Annulaire D
+  "R4-E":     { x: 68, y: 735 }, // Auriculaire D - Mi
+  "R4-F":     { x: 102, y: 745 }, // Auriculaire D - Fa
+  "R4-F#":    { x: 78, y: 700 }, // Auriculaire D - Fa#
+  "R4-G#":    { x: 112, y: 710 }, // Auriculaire D - Sol#
+  "Side1":    { x: 0, y: 0 }, // Mib/Sib latérale
+  "Side2":    { x: 0, y: 0 }  // Fa# chromatique latérale (Pouce G + trille 3 & 4)
+};
+ 
   const imageSrc = "BelleClarinette.jpg";
-
-  /** --- Objet centralisant 46 NOTES différentes MAIS 83 DOIGTÉS DIFFÉRENTS !!! 
-   *  --- CAR PLUSIEURS DOIGTÉS POSSIBLES selon CERTAINES NOTES !!!  --- */
-  const FINGERING_POSITIONS = {
-    "T":  { x: 135, y: 210 }, 
-    "L1": { x: 135, y: 318 }, // C'est le FA#3 le "L1"
-    "L2": { x: 135, y: 395 }, // Exemple à ajuster
-    // "R1": { x: ..., y: ... },
-  };
   const canvasClarinette = document.getElementById("canvasBelleClarinette");
   const ctxClarinette = canvasClarinette.getContext("2d");
   const imgClarinette = new Image();    // Chargement de l'image
   imgClarinette.src = imageSrc;         // Ou imgClarinette.src = "BelleClarinette.jpg";
-
 
 
 /** * FONCTION ESSENTIELLE : Elle dessine l'image ET les pastilles
@@ -985,7 +958,7 @@ window.addEventListener('resize', () => {
 function updateBelleClarinette(activeKeys = []) {
   if (!imgClarinette.complete) return; // Sécurité si l'image n'est pas encore prête
   // 1. On efface et on redessine l'image de fond
-  ctxClarinette.clearRect(0, 0, canvasClarinette.width, canvasClarinette.height); // A Commenter Peut-etre ???
+  // ctxClarinette.clearRect(0, 0, canvasClarinette.width, canvasClarinette.height); // A Commenter Peut-etre ???
   ctxClarinette.drawImage(imgClarinette, 0, 0);     // On redessine l'image (déjà en mémoire, donc ultra rapide)
 
   // 2. On dessine chaque pastille active
@@ -993,12 +966,13 @@ function updateBelleClarinette(activeKeys = []) {
     const pos = FINGERING_POSITIONS[keyId];
     if (pos) {
       ctxClarinette.beginPath();
-      ctxClarinette.arc(pos.x, pos.y, 14, 0, Math.PI * 2);
+      ctxClarinette.arc(pos.x, pos.y, 16, 0, Math.PI * 2);
       ctxClarinette.fillStyle = "rgba(255, 0, 0, 0.8)"; // Rouge un peu transparent
       ctxClarinette.fill();
       ctxClarinette.strokeStyle = "white";
-      ctxClarinette.lineWidth = 2;
+      ctxClarinette.lineWidth = 0.5;
       ctxClarinette.stroke();
+      //<rect id="key-L4-Fsharp" class="key" x="20" y="135" width="15" height="8" rx="2"/>
     }
   });
 }
@@ -1007,66 +981,17 @@ function updateBelleClarinette(activeKeys = []) {
 imgClarinette.onload = () => {
   canvasClarinette.width = imgClarinette.width;
   canvasClarinette.height = imgClarinette.height;
-  
-  // Affiche la clarinette avec le FA#3 (L1) par défaut pour tester
-  updateBelleClarinette(["L1"]); 
+  ctxClarinette.drawImage(imgClarinette, 0, 0);     // on dessine l'image dès qu'elle est prête
 };
 
 imgClarinette.onerror = function() {
   alert("Impossible de charger l'image : " + imageSrc);
 };
 
-  /*
-  img.onload = function() {
-    // Ajuster la taille du canvas à l'image
-    canvasClarinette.width = img.width;
-    canvasClarinette.height = img.height;
-
-    // Dessiner l'image
-    ctxClarinette.drawImage(img, 0, 0);
-
-    // Dessiner la pastille
-    ctxClarinette.beginPath();
-    ctxClarinette.arc(pastille.x, pastille.y, pastille.rayon, 0, Math.PI * 2);
-    ctxClarinette.fillStyle = pastille.couleur;
-    ctxClarinette.fill();
-
-    // Optionnel : bordure autour de la pastille
-    ctxClarinette.lineWidth = 2;
-    ctxClarinette.strokeStyle = "#fff";
-    ctxClarinette.stroke();
-  };
-  */
-  // On s'assure que l'image est chargée avant de faire quoi que ce soit
-  /*
-  imgClarinette.onload = () => {
-    canvasClarinette.width = imgClarinette.width;
-    canvasClarinette.height = imgClarinette.height;
-    // On dessine l'état initial (vide)
-    updateBelleClarinette([]); 
-  };
-  */
-
-  // Gestion des erreurs de chargement
-  img.onerror = function() {
-    alert("Impossible de charger l'image : " + imageSrc);
-  };
-
-  
- /** 5. OUTIL DE DEVE POUR MESURE X:-Y: (F12) **/
-canvasClarinette.addEventListener('mousedown', function(e) {
-    const rect = canvasClarinette.getBoundingClientRect();
-    const x = Math.round((e.clientX - rect.left) * (canvasClarinette.width / rect.width));
-    const y = Math.round((e.clientY - rect.top) * (canvasClarinette.height / rect.height));
-    
-    // Alerte visuelle pour être sûr que vous voyez les chiffres !
-    console.log("CLIC DÉTECTÉ -> x:", x, "y:", y);
-    // Optionnel : affiche les coordonnées directement sur l'écran pour aider
-    ctxClarinette.fillStyle = "yellow";
-    ctxClarinette.fillText(`x: ${x}, y: ${y}`, x, y);
-}); 
-
-
+// Gestion des erreurs de chargement
+// img.onerror = function() {
+//  alert("Impossible de charger l'image : " + imageSrc);
+//};
 
 </script>
 </body>
