@@ -34,7 +34,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh; /* S'assure de prendre au moins tout l'écran */
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
@@ -46,7 +46,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            flex-grow: 1; /* Permet à l'application de s'étirer en hauteur */
+            flex-grow: 1;
         }
 
         .glass-panel {
@@ -224,7 +224,7 @@
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: stretch; /* Permet aux panels de s'étirer jusqu'en bas */
+            align-items: stretch;
             gap: 6px;
             width: 100%;
             flex-grow: 1; 
@@ -239,13 +239,12 @@
             box-sizing: border-box;
         }
 
-        /* Ajustement des proportions pour la version PC */
         .panel:nth-child(1) {
-            flex: 2 1 400px; /* Prend plus de place horizontale */
+            flex: 2 1 400px;
             max-width: 800px;
         }
         .panel:nth-child(2) {
-            flex: 1 1 250px; /* Plus étroit */
+            flex: 1 1 250px;
             max-width: 350px;
         }
         
@@ -289,7 +288,6 @@
             border: 2px solid transparent; 
         }
 
-        /* Conteneur et Image Belle Clarinette */
         #BelleClarinette {
             width: 100%;
             display: flex;
@@ -299,10 +297,9 @@
         }
 
         canvas#canvasBelleClarinette { 
-            /* MODIFICATION PC : Restriction stricte de la hauteur pour empêcher le scroll */
             max-width: 100%;
-            max-height: 60vh; /* Bloqué à 55% de la hauteur de l'écran maximum */
-            width: auto;      /* S'adapte proportionnellement à la hauteur */
+            max-height: 65vh;
+            width: auto;
             height: auto; 
             object-fit: contain;
             display: block;
@@ -347,18 +344,19 @@
             h1 { font-size: 1.1rem; }
             #instruction { font-size: 0.75rem !important; margin-top: 0; }
 
-            /* Grille compacte optimisée hauteur */
+            /* Grille compacte optimisée : 3 boutons sur la même ligne */
             #controls { 
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
-                gap: 2px;
-                padding: 2px;
+                gap: 4px;
+                padding: 4px;
                 margin-bottom: 2px;
             }
             
-            select { grid-column: span 1; font-size: 0.75rem; padding: 0 4px; height: 28px; }
-            #mode-select { grid-column: 1 / span 2; } 
-            #level-select { grid-column: 3 / span 1; } 
+            select, button { font-size: 0.7rem; padding: 0 2px; height: 28px; width: 100%; }
+            #mode-select { grid-column: 1 / span 1; } 
+            #level-select { grid-column: 2 / span 1; } 
+            #upload-btn { grid-column: 3 / span 1; display: flex; align-items: center; justify-content: center;}
             
             .slider-container { 
                 grid-column: 1 / span 2; 
@@ -388,12 +386,11 @@
             h3 { font-size: 0.8rem; margin: 0 0 2px 0; padding-bottom: 1px; }
             
             #staff-container { padding: 0; }
-            canvas#staff-canvas { height: 140px; } /* Augmenté pour ne plus tronquer le Mi 3 ou les suraiguës */
+            canvas#staff-canvas { height: 140px; }
             #note-name-display { font-size: 1rem; min-height: 1.2em; margin-top: 0; }
 
-            /* Image mobile restreinte par la hauteur de l'écran pour éviter le scroll excessif */
             canvas#canvasBelleClarinette { 
-                max-height: 40vh; /* La clarinette ne dépassera pas 40% de la hauteur de l'écran */
+                max-height: 40vh;
                 width: auto;
                 margin: 0 auto;
                 display: block;
@@ -411,16 +408,19 @@
 
     <div id="controls">
         <select id="mode-select">
-            <option value="single">Mode: 1 Note</option>
-            <option value="series">Mode: Série 5 Notes</option>
+            <option value="single">1 Note</option>
+            <option value="series">5 Notes</option>
         </select>
         <select id="level-select">
-            <option value="1">Niv 1: Chalumeau</option>
-            <option value="2">Niv 2: Passage</option>
-            <option value="3">Niv 3: Clairon</option>
-            <option value="4">Niv 4: Chromatique</option>
-            <option value="5">Niv 5: Expert</option>
+            <option value="1">Lvl: 1</option>
+            <option value="2">Lvl: 2</option>
+            <option value="3">Lvl: 3</option>
+            <option value="4">Lvl: 4</option>
+            <option value="5">Lvl: 5</option>
         </select>
+
+        <input type="file" id="file-upload" accept=".txt" style="display: none;">
+        <button id="upload-btn" onclick="document.getElementById('file-upload').click();">📂 Partit.</button>
 
         <div class="slider-container">
             <label for="noise-gate" class="slider-label">Bruit de fond</label>
@@ -470,9 +470,17 @@ const FR_NOTES = {
     "B": "Si"
 };
 
-/**
- * --- TRANSLATION EN NOTES FRANCAISE ---
- */
+// Dictionnaire inverse pour parser les fichiers texte en Français
+const FR_TO_EN = {
+    "do": "C", "do#": "C#", "réb": "Db", "reb": "Db",
+    "ré": "D", "re": "D", "ré#": "D#", "re#": "D#", "mib": "Eb",
+    "mi": "E",
+    "fa": "F", "fa#": "F#", "solb": "Gb",
+    "sol": "G", "sol#": "G#", "lab": "Ab",
+    "la": "A", "la#": "A#", "sib": "Bb",
+    "si": "B"
+};
+
 function getFrenchNoteName(noteKey) {
     const match = noteKey.match(/^([A-G][#b]?)(\d)$/);
     if (match) {
@@ -482,10 +490,6 @@ function getFrenchNoteName(noteKey) {
     return noteKey;
 }
 
-/**
- * --- DOIGTÉES SELON LES NOTES !!! IMPORTANT POUR LES 2 REPRÉSENTATIONS !!! --- 
- * --- ( A AJOUTER, COMPLETER, CORRIGER, MODIFIER )
- */
 const NOTES_DATA = {
     "E3": { freq: 146.83, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E", "R4-F"] },
     "F3": { freq: 155.56, keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F"] },
@@ -522,7 +526,6 @@ const NOTES_DATA = {
     "C6": { freq: 932.33, keys: ["R", "T"] }
 };
 
-// AJOUT DES BÉMOLS (Enharmonie)
 const ENHARMONICS = {
     "Gb3": "F#3", "Ab3": "G#3", "Bb3": "A#3", "Db4": "C#4", "Eb4": "D#4",
     "Gb4": "F#4", "Ab4": "G#4", "Bb4": "A#4", "Db5": "C#5", "Eb5": "D#5",
@@ -530,14 +533,9 @@ const ENHARMONICS = {
 };
 
 for (let [flat, sharp] of Object.entries(ENHARMONICS)) {
-    if (NOTES_DATA[sharp]) {
-        NOTES_DATA[flat] = NOTES_DATA[sharp];
-    }
+    if (NOTES_DATA[sharp]) NOTES_DATA[flat] = NOTES_DATA[sharp];
 }
 
-/**
- * --- CHOIX DES NOTES SELON LE NIVEAU DE DIFFFICULTÉE ---
- */
 const LEVELS = {
     1: ["E3", "F3", "F#3", "G3", "G#3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4"], 
     2: ["G3", "A3", "Bb3", "B3", "C4", "C#4", "D4", "Eb4", "E4", "F4", "F#4", "G4", "Ab4", "A4", "Bb4", "B4", "C5"], 
@@ -550,25 +548,19 @@ const LEVELS = {
  * --- ETAT DU JEU ---
  */
 let noteQueue = []; 
+let durationQueue = []; // NOUVEAU : Gère les temps indépendamment
 let queueIndex = 0; 
+let isPlayingPartition = false; 
 
-/**
- * --- MOTEUR AUDIO (AVEC NOISE GATE) ---
- */
 let audioContext;
 let analyser;
 let microphone;
 let isListening = false;
 
-/**
- * --- FONCTON ASYNCHRONE D'ANALYSE DE LA FRÉQUENCE PORTEUSE ---
- */
 async function initAudio() {
     try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume();
-        }
+        if (audioContext.state === 'suspended') await audioContext.resume();
         analyser = audioContext.createAnalyser();
         analyser.fftSize = 2048;
         
@@ -583,38 +575,30 @@ async function initAudio() {
         updateControlsVisibility();
         document.getElementById('instruction').innerText = "Jouez pour valider !";
         
-        startNewSequence(); 
+        if (!isPlayingPartition) startNewSequence(); 
+        else updateUI();
     } catch (err) {
         alert("Erreur Micro: " + err);
     }
 }
 
-/**
- * --- GESTION DU BOUTON SUIVANT ---
- */
 function updateControlsVisibility() {
     const mode = document.getElementById('mode-select').value;
-    // Grid gère l'affichage, on joue juste sur le display none/block
     const nextBtn = document.getElementById('next-btn');
-    if (mode === 'single' && isListening) {
-        nextBtn.style.display = 'inline-flex'; // inline-flex pour centrer le texte
+    if (!isPlayingPartition && mode === 'single' && isListening) {
+        nextBtn.style.display = 'inline-flex';
     } else {
         nextBtn.style.display = 'none';
     }
 }
 
-/**
- * --- GESTION DU CURSEUR ANTI-BRUIT ---
- */
 function autoCorrelate(buf, sampleRate) {
     let size = buf.length;
     let rms = 0;
     for (let i = 0; i < size; i++) { let val = buf[i]; rms += val * val; }
     rms = Math.sqrt(rms / size);
     
-    // Valeur slider
     const noiseThreshold = parseFloat(document.getElementById('noise-gate').value);
-    
     if (rms < noiseThreshold) return -1; 
 
     let r1 = 0, r2 = size - 1, thres = 0.2;
@@ -648,54 +632,42 @@ function updatePitch() {
     requestAnimationFrame(updatePitch);
 }
 
-/**
- * --- LOGIQUE DE JEU ---
- */
 function getRandomNote(level) {
     const notesPool = LEVELS[level];
     return notesPool[Math.floor(Math.random() * notesPool.length)];
 }
 
-/**
- * --- LOGIQUE DU MODE DE JEU NOTE/ NOTE OU SÉRIE DE 5 NOTES ---
- */
 function startNewSequence() {
+    isPlayingPartition = false; 
     const mode = document.getElementById('mode-select').value;
     const level = parseInt(document.getElementById('level-select').value);
     
     noteQueue = [];
+    durationQueue = [];
     queueIndex = 0;
     
     const count = (mode === 'series') ? 5 : 1;
-    
     for(let i=0; i<count; i++) {
         let newNote;
-        do {
-            newNote = getRandomNote(level);
-        } while (noteQueue.length > 0 && newNote === noteQueue[noteQueue.length-1]);
+        do { newNote = getRandomNote(level); } while (noteQueue.length > 0 && newNote === noteQueue[noteQueue.length-1]);
         noteQueue.push(newNote);
+        durationQueue.push(1); // Noire par défaut pour l'aléatoire
     }
-    
     updateUI();
 }
 
-/**
- * --- AFFICHAGE AU DESSUS DE LA PORTÉE SI LA NOTE EST JUSTE DANS UN ENCADRÉ ---
- */
 function updateUI() {
-    // Réinitialisation affichage
     const displayElement = document.getElementById('detected-note');
     displayElement.innerText = "Attente...";
     displayElement.className = "status-detected";
-    // Modif Gillou pour "effacer les bords du Label contenant la fréquence perçue"
-    displayElement.style.backgroundColor = "rgba(255,255,255,0.1)"; // Reset background "rgba(255,255,255,0.8)"
+    displayElement.style.backgroundColor = "rgba(255,255,255,0.1)"; 
 
     document.getElementById('tuner-indicator').style.left = "50%";
     document.getElementById('tuner-indicator').style.backgroundColor = "#fff";
 
     const currentNote = noteQueue[queueIndex];
     
-    drawStaff(noteQueue, queueIndex);
+    drawStaff(noteQueue, durationQueue, queueIndex);
     
     if(currentNote) {
         showFingering(currentNote);
@@ -705,16 +677,12 @@ function updateUI() {
     }
 }
 
-/**
- * --- ANALYSE DE LA FRÉQUENCE DE LA NOTE ---
- */
 function checkNote(detectedFreq) {
     if (queueIndex >= noteQueue.length) return;
 
     const currentTarget = noteQueue[queueIndex];
     const targetData = NOTES_DATA[currentTarget];
     const targetFreq = targetData.freq;
-    
     const centsDiff = 600 * Math.log2(detectedFreq / targetFreq); 
 
     const tunerIndicator = document.getElementById('tuner-indicator');
@@ -729,49 +697,55 @@ function checkNote(detectedFreq) {
         if (!displayElement.dataset.successLocked) {
             displayElement.dataset.successLocked = "true";
             
-            const mode = document.getElementById('mode-select').value;
-            
-            if (mode === 'series') {
+            if (isPlayingPartition) {
                 displayElement.innerHTML = `<span class="status-match">${getFrenchNoteName(currentTarget)} OK!</span>`;
                 queueIndex++;
-                
                 setTimeout(() => {
                     displayElement.dataset.successLocked = "";
                     if (queueIndex >= noteQueue.length) {
-                          displayElement.innerHTML = `<span class="status-match" style="background-color:var(--accent-gold); color:#1d3557;">TERMINÉ !</span>`;
-                          drawStaff(noteQueue, queueIndex); 
-                          setTimeout(startNewSequence, 1500);
+                          displayElement.innerHTML = `<span class="status-match" style="background-color:var(--accent-gold); color:#1d3557;">FIN PARTITION</span>`;
+                          drawStaff(noteQueue, durationQueue, queueIndex); 
+                          isPlayingPartition = false; 
                     } else {
                         updateUI();
                     }
-                }, 200);
-                
+                }, 400); 
             } else {
-                displayElement.innerHTML = `<span class="status-match">BRAVO !</span>`;
-                setTimeout(() => {
-                    displayElement.dataset.successLocked = "";
-                    startNewSequence();
-                }, 1500);
+                const mode = document.getElementById('mode-select').value;
+                if (mode === 'series') {
+                    displayElement.innerHTML = `<span class="status-match">${getFrenchNoteName(currentTarget)} OK!</span>`;
+                    queueIndex++;
+                    setTimeout(() => {
+                        displayElement.dataset.successLocked = "";
+                        if (queueIndex >= noteQueue.length) {
+                              displayElement.innerHTML = `<span class="status-match" style="background-color:var(--accent-gold); color:#1d3557;">TERMINÉ !</span>`;
+                              drawStaff(noteQueue, durationQueue, queueIndex); 
+                              setTimeout(startNewSequence, 1500);
+                        } else { updateUI(); }
+                    }, 200);
+                } else {
+                    displayElement.innerHTML = `<span class="status-match">BRAVO !</span>`;
+                    setTimeout(() => {
+                        displayElement.dataset.successLocked = "";
+                        startNewSequence();
+                    }, 1500);
+                }
             }
         }
     } else {
         displayElement.innerText = `${Math.round(detectedFreq)} Hz`;
-        displayElement.className = "status-detected"; // Reset class
+        displayElement.className = "status-detected";
         tunerIndicator.style.backgroundColor = Math.abs(centsDiff) > 50 ? "var(--danger-color)" : "#fff";
     }
 }
 
-/**
- * --- DESSIN CANVAS (AVEC BÉMOLS ET CENTRAGE DYNAMIQUE) --- PORTÉE ClÉ de SOL ---
- */
 const canvas = document.getElementById('staff-canvas');
 const ctx = canvas.getContext('2d');
 
-function drawStaff(notes, activeIndex) {
+function drawStaff(fullNotesList, fullDurationsList, activeIndex) {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
     
-    // Ajustement de la résolution
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
     ctx.scale(dpr, dpr);
@@ -781,18 +755,13 @@ function drawStaff(notes, activeIndex) {
 
     ctx.clearRect(0, 0, width, height);
     
-    const isSmallScreen = width < 400; // Détection petit écran
-    const lineSpacing = isSmallScreen ? 11 : 14; // Réduit l'espace sur mobile pour tout faire rentrer
-    
-    // Calcul pour centrer la portée verticalement
-    // La portée fait 4 espaces de haut. Le centre de la portée est à 2 * lineSpacing + staffY
-    // On veut que ce centre soit à height / 2.
+    const isSmallScreen = width < 400; 
+    const lineSpacing = isSmallScreen ? 11 : 14; 
     const staffY = (height / 2) - (2 * lineSpacing);
     
     const startX = 20;
     const endX = width - 20;
     
-    // Lignes de portée
     ctx.strokeStyle = "#333";
     ctx.lineWidth = 1;
     for (let i = 0; i < 5; i++) {
@@ -800,14 +769,30 @@ function drawStaff(notes, activeIndex) {
         ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
     }
     
-    // Clé de sol
     ctx.font = isSmallScreen ? "40px serif" : "50px serif";
     ctx.fillStyle = "#333";
-    // Ajustement position clé selon taille
     const clefOffset = isSmallScreen ? 34 : 42;
     ctx.fillText("𝄞", 10, staffY + clefOffset);
 
-    let xOffset = (notes.length === 1) ? (width / 2) : 60;
+    let maxVisible = 5; 
+    let startIndex = 0;
+    let localActiveIndex = activeIndex;
+
+    // GESTION DU GLISSEMENT AMÉLIORÉ : Garder la note précédente (verte) à gauche
+    if (isPlayingPartition) {
+        if (activeIndex === 0) {
+            startIndex = 0;
+            localActiveIndex = 0;
+        } else {
+            startIndex = activeIndex - 1;
+            localActiveIndex = 1; // La note courante est toujours à l'index 1 (2ème position)
+        }
+    }
+
+    const notesToDraw = fullNotesList.slice(startIndex, startIndex + maxVisible);
+    const durationsToDraw = fullDurationsList.slice(startIndex, startIndex + maxVisible);
+
+    let xOffset = (notesToDraw.length === 1) ? (width / 2) : 60;
 
     const noteStepsFromTop = {
         "C6": -2, "B5": -1.5, "Bb5": -1.5, "A#5": -1, "A5": -1, "Ab5": -1, "G#5": -0.5, "G5": -0.5, "Gb5": -0.5,
@@ -817,18 +802,16 @@ function drawStaff(notes, activeIndex) {
         "A#3": 6, "A3": 6, "Ab3": 6, "G#3": 6.5, "G3": 6.5, "Gb3": 6.5, "F#3": 7, "F3": 7, "E3": 7.5
     };
 
-    notes.forEach((noteName, idx) => {
+    notesToDraw.forEach((noteName, idx) => {
         const steps = noteStepsFromTop[noteName];
         const noteY = staffY + (steps * lineSpacing);
         
         let noteX = xOffset;
-        if (notes.length > 1) {
-            noteX = 70 + (idx * ((width - 100) / (notes.length - 1)));
+        if (notesToDraw.length > 1) {
+            noteX = 80 + (idx * ((width - 110) / (notesToDraw.length - 1)));
         }
 
         ctx.strokeStyle = "#333"; 
-        // Lignes supplémentaires (Ledger lines)
-        // Bas
         if (steps >= 5) { 
             for (let s = 5; s <= steps; s++) {
                 if (s % 1 === 0) {
@@ -837,7 +820,6 @@ function drawStaff(notes, activeIndex) {
                 }
             }
         }
-        // Haut
         if (steps <= -1) { 
             for (let s = -1; s >= steps; s--) {
                 if (s % 1 === 0) {
@@ -848,11 +830,10 @@ function drawStaff(notes, activeIndex) {
         }
 
         let noteColor = "var(--note-pending)";
-        if (idx < activeIndex) noteColor = "var(--note-success)";
-        else if (idx === activeIndex) noteColor = "var(--note-current)";
+        if (idx < localActiveIndex) noteColor = "var(--note-success)";
+        else if (idx === localActiveIndex) noteColor = "var(--note-current)";
 
         ctx.beginPath();
-        // Taille note légèrement réduite si petit écran
         const noteRadiusX = isSmallScreen ? 8 : 9;
         const noteRadiusY = isSmallScreen ? 6 : 7;
         ctx.ellipse(noteX, noteY, noteRadiusX, noteRadiusY, 0, 0, 2 * Math.PI);
@@ -860,10 +841,44 @@ function drawStaff(notes, activeIndex) {
         if(noteColor.includes("success")) ctx.fillStyle = "#06d6a0";
         else if(noteColor.includes("current")) ctx.fillStyle = "#ef476f";
         else ctx.fillStyle = "#000";
-        
         ctx.fill();
 
+        // GESTION VISUELLE DE LA BLANCHE (Centre Blanc)
+        if (durationsToDraw[idx] >= 2) {
+            ctx.fillStyle = "rgba(255,255,255,0.9)"; // S'adapte au fond de la portée
+            ctx.beginPath();
+            ctx.ellipse(noteX, noteY, noteRadiusX - 2.5, noteRadiusY - 2.5, 0, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        // DESSIN DES HAMPES
+        ctx.beginPath();
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = noteColor.includes("pending") ? "#000" : (noteColor.includes("success") ? "#06d6a0" : "#ef476f");
+        if (steps > 2) { 
+            ctx.moveTo(noteX + noteRadiusX - 1, noteY);
+            ctx.lineTo(noteX + noteRadiusX - 1, noteY - 28);
+        } else {
+            ctx.moveTo(noteX - noteRadiusX + 1, noteY);
+            ctx.lineTo(noteX - noteRadiusX + 1, noteY + 28);
+        }
+        ctx.stroke();
+
+        // GESTION VISUELLE DE LA CROCHE (Petit Crochet)
+        if (durationsToDraw[idx] <= 0.5) {
+            ctx.beginPath();
+            if (steps > 2) { 
+                ctx.moveTo(noteX + noteRadiusX - 1, noteY - 28);
+                ctx.quadraticCurveTo(noteX + noteRadiusX + 6, noteY - 15, noteX + noteRadiusX + 8, noteY - 5);
+            } else {
+                ctx.moveTo(noteX - noteRadiusX + 1, noteY + 28);
+                ctx.quadraticCurveTo(noteX - noteRadiusX + 6, noteY + 15, noteX - noteRadiusX + 8, noteY + 5);
+            }
+            ctx.stroke();
+        }
+
         ctx.font = isSmallScreen ? "18px Arial" : "22px Arial";
+        ctx.fillStyle = "#000"; 
         if (noteName.includes("#")) {
             ctx.fillText("♯", noteX - 22, noteY + 6);
         } else if (noteName.includes("b")) {
@@ -879,14 +894,6 @@ function showFingering(noteName) {
     if (data && data.keys) {
         updateBelleClarinette(data.keys);
     }
-
-    /** 4. INITIALISATION AU CHARGEMENT **/
-    imgClarinette.onload = () => {
-        canvasClarinette.width = imgClarinette.width;
-        canvasClarinette.height = imgClarinette.height;
-    // Au début, on dessine la clarinette sans pastille
-   updateBelleClarinette([]);
-};
 }
 
 // Events
@@ -899,49 +906,30 @@ document.getElementById('mode-select').addEventListener('change', () => {
 });
 
 window.addEventListener('resize', () => {
-    if(noteQueue.length > 0) drawStaff(noteQueue, queueIndex);
+    if(noteQueue.length > 0) drawStaff(noteQueue, durationQueue, queueIndex);
 });
 
-/** * --- Insertion d'une representation d'une Belle Clarinette --- 
- * --- Objet centralisant 46 NOTES MAIS 83 DOIGTÉS CAR PLUSIEURS DOIGTÉS POSSIBLES selon CERTAINES NOTES !!!
-**/
 const FINGERING_POSITIONS = {
-  "T":        { x: 32, y: 234 }, // Pouce arrière
-  "R":        { x: 33, y: 186 }, // Registre (12ème)
-  "A":        { x: 135, y: 160 }, // Clé de LA (gorge) "LA"
-  "Ab":       { x: 185, y: 185 }, // Clé de LAB (gorge) "SOL#"
-  "L1":       { x: 134, y: 208 }, // Index G
-  "L2":       { x: 134, y: 300 }, // Majeur G
-  "L3":       { x: 140, y: 368 }, // Annulaire G
-  "L4-E":     { x: 182, y: 452 }, // Auriculaire G - Mi
-  "L4-F":     { x: 206, y: 458 }, // Auriculaire G - Fa
-  "L4-F#":    { x: 210, y: 460 }, // Auriculaire G - Fa#
-  "L4-C#":    { x: 180, y: 395 }, // Auriculaire G - Do#
-  "TR1":      { x: 52, y: 395 }, // Trille 1 (Haut)
-  "TR2":      { x: 52, y: 418 }, // Trille 2
-  "TR3":      { x: 68, y: 440 }, // Trille 3
-  "TR4":      { x: 66, y: 464 }, // Trille 4 (Bas)
-  "R1":       { x: 135, y: 525 }, // Index D
-  "R2":       { x: 135, y: 600 }, // Majeur D
-  "R3":       { x: 135, y: 665 }, // Annulaire D
-  "R4-E":     { x: 68, y: 735 }, // Auriculaire D - Mi
-  "R4-F":     { x: 102, y: 745 }, // Auriculaire D - Fa
-  "R4-F#":    { x: 78, y: 700 }, // Auriculaire D - Fa#
-  "R4-G#":    { x: 112, y: 710 }, // Auriculaire D - Sol#
-  "Side1":    { x: 0, y: 0 }, // Mib/Sib latérale
-  "Side2":    { x: 0, y: 0 }  // Fa# chromatique latérale (Pouce G + trille 3 & 4)
+  "T":        { x: 32, y: 234 }, "R":        { x: 33, y: 186 },
+  "A":        { x: 135, y: 160 }, "Ab":       { x: 185, y: 185 },
+  "L1":       { x: 134, y: 208 }, "L2":       { x: 134, y: 300 },
+  "L3":       { x: 140, y: 368 }, "L4-E":     { x: 182, y: 452 },
+  "L4-F":     { x: 206, y: 458 }, "L4-F#":    { x: 210, y: 460 },
+  "L4-C#":    { x: 180, y: 395 }, "TR1":      { x: 52, y: 395 },
+  "TR2":      { x: 52, y: 418 }, "TR3":      { x: 68, y: 440 },
+  "TR4":      { x: 66, y: 464 }, "R1":       { x: 135, y: 525 },
+  "R2":       { x: 135, y: 600 }, "R3":       { x: 135, y: 665 },
+  "R4-E":     { x: 68, y: 735 }, "R4-F":     { x: 102, y: 745 },
+  "R4-F#":    { x: 78, y: 700 }, "R4-G#":    { x: 112, y: 710 },
+  "Side1":    { x: 0, y: 0 }, "Side2":    { x: 0, y: 0 } 
 };
  
-  const imageSrc = "BelleClarinette.jpg";
-  const canvasClarinette = document.getElementById("canvasBelleClarinette");
-  const ctxClarinette = canvasClarinette.getContext("2d");
-  const imgClarinette = new Image();    // Chargement de l'image
-  imgClarinette.src = imageSrc;         // Ou imgClarinette.src = "BelleClarinette.jpg";
+const imageSrc = "BelleClarinette.jpg";
+const canvasClarinette = document.getElementById("canvasBelleClarinette");
+const ctxClarinette = canvasClarinette.getContext("2d");
+const imgClarinette = new Image();    
+imgClarinette.src = imageSrc;         
 
-
-/** * FONCTION ESSENTIELLE : Elle dessine l'image ET les pastilles
- * @param {Array} activeKeys - Liste des clés à allumer (ex: ["T", "L1"])
- */
 function updateBelleClarinette(activeKeys = []) {
   if (!imgClarinette.complete) return; 
   ctxClarinette.drawImage(imgClarinette, 0, 0);     
@@ -960,16 +948,77 @@ function updateBelleClarinette(activeKeys = []) {
   });
 }
 
-// Chargement de l'image
 imgClarinette.onload = () => {
   canvasClarinette.width = imgClarinette.width;
   canvasClarinette.height = imgClarinette.height;
   ctxClarinette.drawImage(imgClarinette, 0, 0);     
 };
+imgClarinette.onerror = function() { alert("Impossible de charger l'image : " + imageSrc); };
 
-imgClarinette.onerror = function() {
-  alert("Impossible de charger l'image : " + imageSrc);
-};
+// NOUVEAU PARSER DE TEXTE (Sans supprimer les "deux points")
+function parseFrenchNoteToKey(input) {
+    let clean = input.toLowerCase().replace(/[\s-]/g, ''); // N'enlève plus le ":" ici
+    let match = clean.match(/^([a-z]+[#b]?)(\d)?$/);
+    if (match) {
+        let noteName = match[1];
+        let octave = match[2] || "4"; 
+        if (FR_TO_EN[noteName]) {
+            let enNote = FR_TO_EN[noteName] + octave;
+            if (ENHARMONICS[enNote]) enNote = ENHARMONICS[enNote];
+            if (NOTES_DATA[enNote]) return enNote;
+        }
+    }
+    return null;
+}
+
+// NOUVEAU CHARGEUR DE PARTITION (Gère les Temps)
+document.getElementById('file-upload').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const contenu = e.target.result;
+        const mots = contenu.split(/[\s,;]+/); 
+        
+        const notesValides = [];
+        const durationsValides = [];
+
+        mots.forEach(mot => {
+            if (mot.trim() !== '') {
+                // Sépare la note et sa durée avec le caractère ":"
+                let parts = mot.trim().split(':');
+                let notePart = parts[0];
+                let durationPart = parts.length > 1 ? parseFloat(parts[1]) : 1; // 1 par défaut
+
+                let parsed = parseFrenchNoteToKey(notePart);
+                if (parsed) {
+                    notesValides.push(parsed);
+                    durationsValides.push(durationPart);
+                } else if (NOTES_DATA[notePart]) {
+                    notesValides.push(notePart);
+                    durationsValides.push(durationPart);
+                }
+            }
+        });
+        
+        if (notesValides.length > 0) {
+            isPlayingPartition = true; 
+            noteQueue = notesValides;
+            durationQueue = durationsValides;
+            queueIndex = 0;
+            
+            document.getElementById('instruction').innerText = "Partition : " + file.name;
+            updateUI();
+            
+            if (!isListening) alert("Partition chargée ! Cliquez sur 'Micro' pour commencer.");
+        } else {
+            alert("Aucune note reconnue. Exemple de syntaxe : mi3:2 fa#:1 do5:0.5");
+        }
+        event.target.value = ''; 
+    };
+    reader.readAsText(file);
+});
 
 </script>
 </body>

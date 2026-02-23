@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcripteur Clarinette PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+        .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        button {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #btn-start { background: #4cc9f0; color: #000; }
+        #btn-stop { background: #f72585; color: white; display: none; }
+        
+        .settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        label { font-size: 0.8rem; display: block; margin-bottom: 5px; color: #4cc9f0; }
+        
+        #transcription-box {
+            background: #000;
+            color: #00ff00;
+            min-height: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            text-align: left;
+            border: 1px solid #333;
+        }
+        .note-bubble { color: #fff; background: #333; padding: 2px 6px; border-radius: 4px; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 style="color: #4cc9f0; margin-top:0;">Transcripteur Rapide 🚀</h1>
+    
+    <div class="settings">
+        <div>
+            <label>Rapidité de capture</label>
+            <input type="range" id="speed-range" min="1" max="10" value="2">
+            <div style="font-size:0.7rem">Petit = Rapide</div>
+        </div>
+        <div>
+            <label>Seuil de bruit (Gate)</label>
+            <input type="range" id="gate-range" min="0.01" max="0.2" step="0.01" value="0.05">
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="btn-start">▶️ LANCER L'ÉCOUTE</button>
+        <button id="btn-stop">⏹️ STOP & EXPORT .TXT</button>
+    </div>
+
+    <div id="transcription-box">Les notes s'afficheront ici...</div>
+    <p style="font-size: 0.7rem; margin-top: 15px; opacity: 0.6;">Astuce : Pour capturer YouTube, activez "Mixage Stéréo" dans Windows.</p>
+</div>
+
+<script>
+const NOTES_DATA = {
+    "E3": 146.83, "F3": 155.56, "F#3": 164.81, "G3": 174.61, "G#3": 185.00, "A3": 196.00, "A#3": 207.65, "B3": 220.00, 
+    "C4": 233.08, "C#4": 246.94, "D4": 261.63, "D#4": 277.18, "E4": 293.66, "F4": 311.13, "F#4": 329.63, "G4": 349.23, 
+    "G#4": 369.99, "A4": 392.00, "A#4": 415.30, "B4": 440.00, "C5": 466.16, "C#5": 493.88, "D5": 523.25, "D#5": 554.37, 
+    "E5": 587.33, "F5": 622.25, "F#5": 659.25, "G5": 698.46, "G#5": 739.99, "A5": 783.99, "A#5": 830.61, "B5": 880.00, "C6": 932.33
+};
+
+const EN_TO_FR = {"C":"do","C#":"do#","D":"re","D#":"re#","E":"mi","F":"fa","F#":"fa#","G":"sol","G#":"sol#","A":"la","A#":"la#","B":"si"};
+
+let audioContext, analyser, microphone, isListening = false, animationId;
+let transcription = [], lastRecordedNote = null, stableFrames = 0, silenceFrames = 0;
+
+async function startListening() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    microphone = audioContext.createMediaStreamSource(stream);
+    microphone.connect(analyser);
+    isListening = true;
+    transcription = [];
+    document.getElementById('transcription-box').innerHTML = "";
+    document.getElementById('btn-start').style.display = 'none';
+    document.getElementById('btn-stop').style.display = 'block';
+    updatePitch();
+}
+
+function autoCorrelate(buf, sampleRate) {
+    let size = buf.length, rms = 0;
+    for (let i = 0; i < size; i++) rms += buf[i] * buf[i];
+    rms = Math.sqrt(rms / size);
+    if (rms < document.getElementById('gate-range').value) return -1;
+
+    let r1 = 0, r2 = size - 1, thres = 0.2;
+    for (let i = 0; i < size / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+    for (let i = 1; i < size / 2; i++) if (Math.abs(buf[size - i]) < thres) { r2 = size - i; break; }
+    buf = buf.slice(r1, r2);
+    size = buf.length;
+    let c = new Array(size).fill(0);
+    for (let i = 0; i < size; i++) for (let j = 0; j < size - i; j++) c[i] = c[i] + buf[j] * buf[j + i];
+    let d = 0; while (c[d] > c[d + 1]) d++;
+    let maxval = -1, maxpos = -1;
+    for (let i = d; i < size; i++) if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+    let T0 = maxpos;
+    let x1 = c[T0-1], x2 = c[T0], x3 = c[T0+1];
+    let a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2;
+    if (a) T0 = T0 - b / (2 * a);
+    return sampleRate / T0;
+}
+
+function updatePitch() {
+    if (!isListening) return;
+    const buf = new Float32Array(analyser.fftSize);
+    analyser.getFloatTimeDomainData(buf);
+    const freq = autoCorrelate(buf, audioContext.sampleRate);
+    
+    if (freq === -1) {
+        if (++silenceFrames > 15) lastRecordedNote = null;
+        stableFrames = 0;
+    } else {
+        silenceFrames = 0;
+        let minDiff = Infinity, closestNote = null;
+        for (let [note, tFreq] of Object.entries(NOTES_DATA)) {
+            let diff = Math.abs(freq - tFreq);
+            if (diff < minDiff) { minDiff = diff; closestNote = note; }
+        }
+
+        if (closestNote && minDiff < 25) {
+            if (closestNote === lastRecordedNote) {
+                stableFrames = 0;
+            } else {
+                if (++stableFrames >= parseInt(document.getElementById('speed-range').value)) {
+                    lastRecordedNote = closestNote;
+                    let fr = (EN_TO_FR[closestNote.match(/^([A-G][#]?)/)[1]] || "") + closestNote.slice(-1);
+                    transcription.push(fr);
+                    document.getElementById('transcription-box').innerText = transcription.join(' ');
+                    stableFrames = 0;
+                }
+            }
+        }
+    }
+    animationId = requestAnimationFrame(updatePitch);
+}
+
+document.getElementById('btn-stop').addEventListener('click', () => {
+    isListening = false;
+    cancelAnimationFrame(animationId);
+    const blob = new Blob([transcription.join(' ')], { type: "text/plain" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Ma_Partition.txt";
+    a.click();
+    document.getElementById('btn-start').style.display = 'block';
+    document.getElementById('btn-stop').style.display = 'none';
+});
+
+document.getElementById('btn-start').addEventListener('click', startListening);
+</script>
+</body>
+</html>
