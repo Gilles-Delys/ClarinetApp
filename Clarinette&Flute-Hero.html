@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Clarinette & Flûte Hero - Edition Pro</title>
+    <style>
+        body { font-family: sans-serif; background: #1a1a2e; color: white; margin: 0; height: 100vh; overflow: hidden; }
+        #main-container { display: flex; flex-direction: row; width: 100%; height: 100vh; }
+        #cote-instrument { 
+            flex: 0 0 250px; background-color: #252539; border-right: 3px solid #3498db;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px;
+        }
+        
+        #instrument-wrapper { 
+            position: relative; 
+            display: inline-block; 
+            max-height: 80vh; 
+        }
+        #clarinette-img { 
+            height: 100%; 
+            max-height: 80vh; 
+            width: auto; 
+            display: block; 
+        }
+        #pastilles-container { 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; 
+        }
+        
+        .pastille {
+            position: absolute; width: 14px; height: 14px; background-color: #e74c3c;
+            border: 2px solid white; border-radius: 50%;
+            transform: translate(-50%, -50%); 
+            box-shadow: 0 0 10px rgba(231, 76, 60, 0.9); z-index: 10;
+        }
+
+        #cote-jeu { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 20px; justify-content: flex-start; overflow-y: auto; }
+        canvas { background: black; border: 3px solid #3498db; border-radius: 10px; width: 800px; height: 300px; }
+        .controles { background: #16213e; padding: 15px; border-radius: 10px; margin-top: 10px; display: flex; gap: 15px; align-items: flex-end; justify-content: center; flex-wrap: wrap; max-width: 900px; }
+        button, .btn-fichier { padding: 10px 20px; cursor: pointer; font-weight: bold; background: #27ae60; border: none; color: white; border-radius: 5px; text-align: center; }
+        .btn-fichier { background: #8e44ad; display: inline-block; }
+        #note-nom { font-size: 2em; color: #2ecc71; height: 50px; margin-top: 5px; font-weight: bold; }
+        select { background: #252539; color: white; border: 1px solid #3498db; padding: 5px; border-radius: 4px; }
+        label { font-size: 0.8em; color: #3498db; margin-bottom: 5px; display: block;}
+        .switch-btn { background: #3498db; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 0.8em; font-weight: bold; border: none; color: white; }
+    </style>
+</head>
+<body>
+    <div id="main-container">
+        <div id="cote-instrument">
+            <div id="instrument-wrapper">
+                <img src="BelleClarinette.jpg" id="clarinette-img" alt="Instrument">
+                <div id="pastilles-container"></div>
+            </div>
+            <button class="switch-btn" id="btnSwitchImage">PASSER À LA FLÛTE</button>
+            <button class="switch-btn" id="btnSib" style="background: #e67e22;">TRANSPOSITION SIB : OFF</button>
+        </div>
+
+        <div id="cote-jeu"> 
+            <h2 style="margin: 0;">🎷 Espace Détente - Clarinette & Flûte</h2>
+            <div id="note-nom">---</div>
+                
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="display: flex; flex-direction: column; align-items: center; background: #16213e; padding: 10px; border-radius: 8px; border: 1px solid #3498db;">
+                    <label style="font-weight: bold; text-align: center;">TEMPO</label>
+                    <input type="range" id="reglageVitesse" min="0.1" max="1.0" value="1" step="0.05" style="appearance: slider-vertical; width: 20px; height: 200px; cursor: pointer;">
+                    <div id="valeur-tempo" style="font-size: 0.8em; margin-top: 5px;">100%</div>
+                </div>
+                <canvas id="surfCanvas" width="800" height="300"></canvas>
+            </div>
+
+            <input type="range" id="progression" value="0" step="0.1" style="width: 800px; margin: 10px 0;">
+            
+            <div class="controles">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end;">
+                    <label for="midiInput" class="btn-fichier">📁 CHOISIR UN FICHIER</label>
+                    <input type="file" id="midiInput" accept=".mid" style="display: none;">
+                    <span id="nom-fichier" style="font-size: 0.7em; color: #aaa; margin-top: 5px; max-width: 150px; text-align: center;">Aucun fichier</span>
+                </div>
+
+                <div>
+                    <label>Partition (Solo)</label>
+                    <select id="selectInstrument"></select>
+                    <label style="margin-top: 5px; color: #e74c3c; cursor: pointer;">
+                        <input type="checkbox" id="muteSolo"> Rendre muet
+                    </label>
+                </div>
+
+                <div>
+                    <label>Accomp. (Ctrl+Clic)</label>
+                    <select id="selectAccompagnement" multiple size="3" style="min-width: 150px;"></select>
+                </div>
+
+                <button id="btnJouer">LANCER</button>
+                <button id="btnStop" style="background:#c0392b">STOP / RESET</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <script>
+        const canvas = document.getElementById('surfCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); 
+        const notesFr = { 'C': 'Do', 'C#': 'Do#', 'Db': 'Réb', 'D': 'Ré', 'D#': 'Ré#', 'Eb': 'Mib', 'E': 'Mi', 'F': 'Fa', 'F#': 'Fa#', 'G': 'Sol', 'G#': 'Sol#', 'A': 'La', 'A#': 'La#', 'B': 'Si' };
+
+        let midiData = null;
+        let notesAffichees = []; 
+        let modeSib = false; 
+        const ligneVerteX = 150;
+        const VITESSE_VISUELLE = 150; 
+        
+        let tempoRatio = 1.0; 
+
+        const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        let isPlaying = false;
+        let animationId = null;
+
+        const NOTES_DATA = {
+            "E3": { keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E", "R4-F"] },
+            "F3": { keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F"] },
+            "F#3": { keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-F#"] },
+            "G3": { keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3"] },
+            "G#3": { keys: ["T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-G#"] },
+            "A3": { keys: ["T", "L1", "L2", "L3", "R1", "R2"] },
+            "A#3": { keys: ["T", "L1", "L2", "L3", "R1"] }, 
+            "B3": { keys: ["T", "L1", "L2", "L3", "R2"] }, 
+            "C4": { keys: ["T", "L1", "L2", "L3"] },
+            "C#4": { keys: ["T", "L1", "L2", "L3", "L4-C#"] },
+            "D4": { keys: ["T", "L1", "L2"] },
+            "D#4": { keys: ["T", "L1", "L2", "TR4"] },
+            "E4": { keys: ["T", "L1"] },
+            "F4": { keys: ["T"] },
+            "F#4": { keys: ["L1"] },
+            "G4": { keys: [] }, 
+            "G#4": { keys: ["Ab"] },
+            "A4": { keys: ["A"] },
+            "A#4": { keys: ["A", "R"] }, 
+            "B4": { keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "L4-E"] },
+            "C5": { keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F"] },
+            "C#5": { keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-F#"] },
+            "D5": { keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3"] },
+            "D#5": { keys: ["R", "T", "L1", "L2", "L3", "R1", "R2", "R3", "R4-G#"] },
+            "E5": { keys: ["R", "T", "L1", "L2", "L3", "R1", "R2"] },
+            "F5": { keys: ["R", "T", "L1", "L2", "L3", "R1"] },
+            "F#5": { keys: ["R", "T", "L1", "L2", "L3", "R2"] },
+            "G5": { keys: ["R", "T", "L1", "L2", "L3"] },
+            "G#5": { keys: ["R", "T", "L1", "L2", "L3", "R4-G#"] },
+            "A5": { keys: ["R", "T", "L1", "L2"] },
+            "A#5": { keys: ["R", "T", "L1", "L2", "TR4"] },
+            "B5": { keys: ["R", "T", "L1"] },
+            "C6": { keys: ["R", "T"] }
+        };
+
+        const FINGERING_POSITIONS = {
+            "T":      { x: 30, y: 193 }, "R":      { x: 33, y: 186 },
+            "A":      { x: 135, y: 160 }, "Ab":     { x: 185, y: 185 },
+            "L1":     { x: 134, y: 208 }, "L2":     { x: 134, y: 300 },
+            "L3":     { x: 140, y: 368 }, "L4-E":   { x: 182, y: 452 },
+            "L4-F":   { x: 206, y: 458 }, "L4-F#":  { x: 210, y: 460 },
+            "L4-C#":  { x: 180, y: 395 }, "TR1":    { x: 52, y: 395 },
+            "TR2":    { x: 52, y: 418 }, "TR3":    { x: 68, y: 440 },
+            "TR4":    { x: 66, y: 464 }, "R1":     { x: 135, y: 525 },
+            "R2":     { x: 135, y: 600 }, "R3":     { x: 135, y: 665 },
+            "R4-E":   { x: 68, y: 735 }, "R4-F":   { x: 102, y: 745 },
+            "R4-F#":  { x: 78, y: 700 }, "R4-G#":  { x: 112, y: 710 }
+        };
+
+        const NOTES_DATA_FLUTE = {
+            "C4": { keys: ["F-L1", "F-L2"] },
+            "D4": { keys: ["F-L1"] }
+        };
+
+        const FINGERING_POSITIONS_FLUTE = {
+            "F-L1": { x: 50, y: 100 },
+            "F-L2": { x: 50, y: 150 }
+        };
+
+        const ENHARMONICS = {
+            "Gb3": "F#3", "Ab3": "G#3", "Bb3": "A#3", "Db4": "C#4", "Eb4": "D#4",
+            "Gb4": "F#4", "Ab4": "G#4", "Bb4": "A#4", "Db5": "C#5", "Eb5": "D#5",
+            "Gb5": "F#5", "Ab5": "G#5", "Bb5": "A#5"
+        };
+
+        let isFlute = false;
+        document.getElementById('btnSwitchImage').onclick = () => {
+            isFlute = !isFlute;
+            document.getElementById('clarinette-img').src = isFlute ? "FluteIsabelle.jpg" : "BelleClarinette.jpg";
+            document.getElementById('btnSwitchImage').innerText = isFlute ? "PASSER À LA CLARINETTE" : "PASSER À LA FLÛTE";
+            document.getElementById('btnSib').style.display = isFlute ? "none" : "block"; 
+            document.getElementById('pastilles-container').innerHTML = ''; 
+        };
+
+        // POINT 3 : Transposition dynamique
+        document.getElementById('btnSib').onclick = () => {
+            modeSib = !modeSib;
+            document.getElementById('btnSib').innerText = `TRANSPOSITION SIB : ${modeSib ? 'ON' : 'OFF'}`;
+            document.getElementById('btnSib').style.background = modeSib ? "#27ae60" : "#e67e22";
+            // Si la musique joue, on recalcule la position en direct sans couper
+            if (isPlaying) planifierEtJouer(Tone.Transport.seconds); 
+        };
+
+        function getNoteY(noteMidi) {
+            const octave = Math.floor(noteMidi / 12) - 1;
+            const pitchClass = noteMidi % 12;
+            const diatonicStep = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+            const absoluteDiatonic = (octave * 7) + diatonicStep[pitchClass];
+            const ecart = absoluteDiatonic - 34;
+            return 150 - (ecart * 10);
+        }
+
+        function preparerBufferVisuel(idxPisteSolo) {
+            if (!midiData) return;
+            const notesOriginales = midiData.tracks[idxPisteSolo].notes;
+            
+            notesAffichees = notesOriginales.map(n => {
+                let noteMidiVisuelle = n.midi;
+                // POINT 3 : On décale bien de 2 demi-tons visuellement 
+                if (!isFlute && modeSib) {
+                    noteMidiVisuelle += 2;
+                }
+                
+                let nomPitch = Tone.Frequency(noteMidiVisuelle, "midi").toNote().replace(/[0-9]/g, '');
+                
+                return {
+                    time: n.time / tempoRatio, 
+                    duration: n.duration / tempoRatio, 
+                    midi: noteMidiVisuelle, // Stocke la note visuelle/transposée pour le doigté
+                    y: getNoteY(noteMidiVisuelle),
+                    estBlancheOuRonde: n.duration >= 0.8,
+                    estRonde: n.duration >= 1.6,
+                    nomFr: notesFr[nomPitch] || nomPitch,
+                    jouee: false
+                };
+            });
+        }
+
+        function preparerDoigteInstrument(noteMidiTranspo) {
+            const conteneur = document.getElementById('pastilles-container');
+            conteneur.innerHTML = ''; 
+
+            let nomAnglo;
+            let dataNote;
+            let dicoPositions;
+
+            if (isFlute) {
+                nomAnglo = Tone.Frequency(noteMidiTranspo, "midi").toNote();
+                if (ENHARMONICS[nomAnglo]) nomAnglo = ENHARMONICS[nomAnglo];
+                dataNote = NOTES_DATA_FLUTE[nomAnglo];
+                dicoPositions = FINGERING_POSITIONS_FLUTE;
+            } else {
+                // La transposition est déjà calculée dans noteMidiTranspo via le buffer
+                nomAnglo = Tone.Frequency(noteMidiTranspo, "midi").toNote();
+                if (ENHARMONICS[nomAnglo]) nomAnglo = ENHARMONICS[nomAnglo];
+                dataNote = NOTES_DATA[nomAnglo];
+                dicoPositions = FINGERING_POSITIONS;
+            }
+
+            if (dataNote && dataNote.keys) {
+                dataNote.keys.forEach(key => {
+                    const pos = dicoPositions[key];
+                    if (pos) {
+                        const pastille = document.createElement('div');
+                        pastille.className = 'pastille';
+                        pastille.style.left = pos.x + 'px';
+                        pastille.style.top = pos.y + 'px';
+                        conteneur.appendChild(pastille);
+                    }
+                });
+            }
+        }
+
+        function dessinerPorteeVide() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = "#aaa"; ctx.lineWidth = 1;
+            for(let i=-2; i<=2; i++) {
+                let y = 150 + (i * 20);
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+            
+            // POINT 7 : Clé de sol agrandie
+            // <-- GILOU : MODIFIER ICI pour la Clé de Sol
+            ctx.font = "110px serif"; // Taille (augmentée d'1/3, avant 80px)
+            let cleX = 10;            // Position Horizontale
+            let cleY = 188;           // Position Verticale (Ajustée pour la nouvelle taille)
+            ctx.fillStyle = "#3498db"; 
+            ctx.fillText("𝄞", cleX, cleY);
+            
+            ctx.strokeStyle = "#2ecc71"; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(ligneVerteX, 0); ctx.lineTo(ligneVerteX, canvas.height); ctx.stroke();
+        }
+
+        function dessiner() {
+            if (!isPlaying) return;
+            dessinerPorteeVide();
+            
+            const tempsActuel = Tone.Transport.seconds;
+
+            // POINT 2 : Optimisation de la Grille
+            if (midiData) {
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.4)"; ctx.lineWidth = 2;
+                for (let t_orig = 0; t_orig <= midiData.duration; t_orig += 2) {
+                    let t_dilate = t_orig / tempoRatio;
+                    let bx = ligneVerteX + (t_dilate - tempsActuel) * VITESSE_VISUELLE;
+                    
+                    if (bx > canvas.width) break; // FLUIDITÉ : Stoppe le dessin si hors écran à droite
+                    
+                    if (bx > 0) {
+                        ctx.beginPath(); ctx.moveTo(bx, 110); ctx.lineTo(bx, 190); ctx.stroke();
+                    }
+                }
+            }
+
+            // POINT 2 : Optimisation du Bouclage des Notes
+            for (let i = 0; i < notesAffichees.length; i++) {
+                let n = notesAffichees[i];
+                let x = ligneVerteX + (n.time - tempsActuel) * VITESSE_VISUELLE;
+                
+                if (x > canvas.width + 50) break; // FLUIDITÉ : Stoppe la boucle si on dépasse l'écran (énorme gain CPU)
+                if (x < -50) continue;            // FLUIDITÉ : Ignore les notes passées
+                
+                let y = n.y; 
+
+                ctx.strokeStyle = "white"; ctx.lineWidth = 1;
+                if (y <= 90) { 
+                    for (let l = 90; l >= y; l -= 20) {
+                        ctx.beginPath(); ctx.moveTo(x - 15, l); ctx.lineTo(x + 15, l); ctx.stroke();
+                    }
+                }
+                if (y >= 210) { 
+                    for (let l = 210; l <= y; l += 20) {
+                        ctx.beginPath(); ctx.moveTo(x - 15, l); ctx.lineTo(x + 15, l); ctx.stroke();
+                    }
+                }
+
+                let couleurPastille = (!isFlute && modeSib) ? "#e67e22" : "#3498db";
+
+                if (!n.estRonde) {
+                    ctx.strokeStyle = "white"; ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    if (y >= 150) { 
+                        ctx.moveTo(x + 8, y); ctx.lineTo(x + 8, y - 30);
+                    } else { 
+                        ctx.moveTo(x - 8, y); ctx.lineTo(x - 8, y + 30);
+                    }
+                    ctx.stroke();
+                }
+
+                ctx.beginPath(); ctx.arc(x, y, 9, 0, Math.PI*2);
+                if (n.estBlancheOuRonde) {
+                    ctx.fillStyle = "#1a1a2e"; ctx.fill();
+                    ctx.strokeStyle = couleurPastille; ctx.lineWidth = 3; ctx.stroke();
+                } else {
+                    ctx.fillStyle = couleurPastille; ctx.fill();
+                    ctx.strokeStyle = "white"; ctx.lineWidth = 1.5; ctx.stroke();
+                }
+
+                // POINT 4 : Taille et position des Noms de Notes
+                // <-- GILOU : MODIFIER ICI pour les étiquettes Do, Ré, Mi...
+                ctx.fillStyle = "white"; 
+                ctx.font = "bold 20px Arial"; // Taille du texte (augmentée de 16 à 20)
+                let decalageGauche = 20;      // Décalage vers la gauche (augmente ce chiffre pour pousser plus à gauche)
+                let decalageHaut = 24;        // Décalage vers le haut
+                ctx.fillText(n.nomFr, x - decalageGauche, y - decalageHaut);
+
+                if (tempsActuel >= n.time && !n.jouee) {
+                    n.jouee = true;
+                    document.getElementById('note-nom').innerText = n.nomFr; 
+                    preparerDoigteInstrument(n.midi);
+                }
+            }
+            animationId = requestAnimationFrame(dessiner);
+        }
+
+        dessinerPorteeVide();
+
+        setInterval(() => {
+            if (isPlaying) {
+                document.getElementById('progression').value = Tone.Transport.seconds;
+            }
+        }, 150); 
+
+        document.getElementById('midiInput').addEventListener('change', async (e) => {
+            const fichier = e.target.files[0];
+            if(!fichier) return;
+            document.getElementById('nom-fichier').innerText = fichier.name;
+
+            const res = await fichier.arrayBuffer();
+            midiData = new Midi(res);
+            
+            const optionsHtml = midiData.tracks.map((t, i) => 
+                `<option value="${i}">Piste ${i+1} ${t.name ? '- ' + t.name : ''} (${t.notes.length} notes)</option>`
+            ).join('');
+            
+            document.getElementById('selectInstrument').innerHTML = optionsHtml;
+            document.getElementById('selectAccompagnement').innerHTML = optionsHtml;
+            
+            document.getElementById('progression').max = midiData.duration / tempoRatio;
+        });
+
+        // POINT 5 & 6 : Rendre le MUTE et l'ACCOMPAGNEMENT dynamiques
+        document.getElementById('muteSolo').addEventListener('change', () => {
+            if (isPlaying) planifierEtJouer(Tone.Transport.seconds); // Reprend instantanément là où ça en est
+        });
+
+        document.getElementById('selectAccompagnement').addEventListener('change', () => {
+            if (isPlaying) planifierEtJouer(Tone.Transport.seconds); // Reprend instantanément
+        });
+
+        function planifierEtJouer(tempsDepartRelatif = 0) {
+            if (!midiData) return;
+            
+            Tone.Transport.pause(); 
+            Tone.Transport.cancel(); 
+            synth.releaseAll(); 
+            
+            const idxPart = document.getElementById('selectInstrument').value;
+            const idxAccomp = Array.from(document.getElementById('selectAccompagnement').selectedOptions).map(o => o.value);
+            const isMute = document.getElementById('muteSolo').checked;
+
+            const nouvelleDureeMax = midiData.duration / tempoRatio;
+            document.getElementById('progression').max = nouvelleDureeMax;
+
+            preparerBufferVisuel(idxPart);
+
+            [idxPart, ...idxAccomp].forEach((idx, i) => {
+                let vol = 0.4; 
+                if (i === 0) vol = isMute ? 0 : 1; 
+
+                midiData.tracks[idx].notes.forEach(note => {
+                    const tempsDilate = note.time / tempoRatio;
+                    const dureeDilateeNote = note.duration / tempoRatio;
+                    
+                    Tone.Transport.schedule((time) => {
+                        if (vol > 0) {
+                            synth.triggerAttackRelease(note.name, dureeDilateeNote, time, note.velocity * vol);
+                        }
+                    }, tempsDilate);
+                });
+            });
+
+            Tone.Transport.seconds = tempsDepartRelatif;
+            
+            notesAffichees.forEach(n => {
+                if (n.time <= tempsDepartRelatif) {
+                    n.jouee = true;
+                }
+            });
+
+            if (!isPlaying) {
+                isPlaying = true;
+                if (animationId) cancelAnimationFrame(animationId);
+                dessiner();
+            }
+            Tone.Transport.start();
+        }
+
+        document.getElementById('progression').oninput = (e) => { 
+            if (isPlaying) {
+                planifierEtJouer(parseFloat(e.target.value));
+            } else {
+                Tone.Transport.seconds = parseFloat(e.target.value); 
+            }
+        };
+
+        // Point 1 : Le Tempo Dynamique (Intact car il marchait parfaitement)
+        document.getElementById('reglageVitesse').addEventListener('input', (e) => {
+            tempoRatio = parseFloat(e.target.value);
+            document.getElementById('valeur-tempo').innerText = Math.round(tempoRatio * 100) + "%";
+            
+            if (isPlaying) {
+                const progressionActuelle = document.getElementById('progression').value;
+                const maxAvant = document.getElementById('progression').max;
+                const pourcentage = progressionActuelle / maxAvant;
+                const nouveauTemps = (midiData.duration / tempoRatio) * pourcentage;
+                planifierEtJouer(nouveauTemps);
+            }
+        });
+
+        document.getElementById('btnJouer').onclick = async () => {
+            if (!midiData) return;
+            await Tone.start();
+            planifierEtJouer(0); 
+        };
+
+        document.getElementById('btnStop').onclick = () => {
+            Tone.Transport.stop();
+            Tone.Transport.cancel(); 
+            synth.releaseAll(); 
+            Tone.Transport.seconds = 0;
+            isPlaying = false;
+            if (animationId) cancelAnimationFrame(animationId); 
+            
+            document.getElementById('note-nom').innerText = "ARRÊT";
+            document.getElementById('progression').value = 0;
+            document.getElementById('pastilles-container').innerHTML = ''; 
+            if(notesAffichees) notesAffichees.forEach(n => n.jouee = false);
+            dessinerPorteeVide();
+        };
+    </script>
+</body>
+</html>
